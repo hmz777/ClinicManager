@@ -1,0 +1,23 @@
+﻿
+
+#login-container {
+    background: white;
+    border-radius: 1rem;
+    margin: auto 0;
+    width: 100%;
+    padding: 1rem;
+    box-shadow: 0px 0px 5.3px rgba(0, 0, 0, 0.028), 0px 0px 12.6px rgba(0, 0, 0, 0.04), 0px 0px 23.8px rgba(0, 0, 0, 0.05), 0px 0px 42.4px rgba(0, 0, 0, 0.06), 0px 0px 79.4px rgba(0, 0, 0, 0.072), 0px 0px 190px rgba(0, 0, 0, 0.1);
+
+    form {
+    }
+
+    svg, path {
+        max-width: 40%;
+        margin: 0 auto 2rem;
+        fill: $accent;
+    }
+
+    .sub-btn {
+        background: $accent;
+    }
+}

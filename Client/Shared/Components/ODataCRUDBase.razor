@@ -1,0 +1,311 @@
+﻿@using ClinicProject.Client.Helpers
+@using ClinicProject.Client.Models.CRUD
+@using ClinicProject.Client.Services
+@using ClinicProject.Client.Shared.Patients
+@using ClinicProject.Shared.Attributes
+@using ClinicProject.Shared.DTOs
+@using System
+@using ClinicProject.Shared.Models.Error
+@using ClinicProject.Shared.Models.Patient
+@using System.ComponentModel.DataAnnotations
+@typeparam T where T : DTOBase
+
+<MudTable @ref="@Table"
+          ServerData="@(new Func<TableState, Task<TableData<T>>>(ServerReload))"
+          CanCancelEdit="true"
+          Hover="true"
+          Breakpoint="Breakpoint.LgAndDown"
+          LoadingProgressColor="Color.Primary"
+          T="T"
+          MultiSelection="true"
+          FixedHeader="true"
+          FixedFooter="true"
+          RowsPerPage="10"
+          RowEditPreview="ItemBackup"
+          RowEditCancel="OnItemEditCancel"
+          RowEditCommit="OnItemEditCommit"
+          IsEditRowSwitchingBlocked="true"
+          SelectedItems="SelectedItems"
+          SelectedItemsChanged="SelectedItemsChanged">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Patients</MudText>
+        <MudPaper Class="ml-3" Elevation="0">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OnAddPatient">Add Patient</MudButton>
+            <MudButton Disabled="@(!CanDelete)" Variant="Variant.Filled" Color="Color.Error">Delete</MudButton>
+        </MudPaper>
+        <MudSpacer />
+        <MudTextField T="string" ValueChanged="@(s=> OnSearch(s))" Placeholder="Search patients" Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Outlined.Search" AdornmentColor="Color.Primary" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <ColGroup>
+        <col />
+        <col />
+        <col style="width:15%;" />
+        <col style="width:20%;" />
+        <col style="width:15%;" />
+        <col />
+        <col />
+        <col style="width:15%;" />
+        <col />
+        <col />
+        <col />
+        <col />
+    </ColGroup>
+    <HeaderContent>
+        <MudTh><MudTableSortLabel SortLabel="Id" T="PatientDTO">Id</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="FirstName" T="PatientDTO">First Name</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="MiddleName" T="PatientDTO">Middle Name</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="LastName" T="PatientDTO">Last Name</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="Age" T="PatientDTO">Age</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="Gender" T="PatientDTO">Gender</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="PhoneNumber" T="PatientDTO">Phone Number</MudTableSortLabel></MudTh>
+        <MudTh>Appointments</MudTh>
+        <MudTh>Treatments</MudTh>
+        <MudTh>Notes</MudTh>
+        <MudTh>Extra Data</MudTh>
+        @foreach (var property in typeof(T).GetProperties())
+        {
+            var dataField = property.GetCustomAttributes(typeof(DataFieldAttribute), true).Cast<DataFieldAttribute>().First();
+            var disp = property.GetCustomAttributes(typeof(DisplayAttribute), true).Cast<DisplayAttribute>().First();
+
+            if (dataField.DataField != DataField.Navigation)
+            {
+                <MudTh><MudTableSortLabel T="T" SortLabel="@(disp.Name)">@disp.Name</MudTableSortLabel></MudTh>
+            }
+            else
+            {
+                <MudTh>@disp.Name</MudTh>
+            }
+        }
+    </HeaderContent>
+    <RowTemplate>
+        @foreach (var property in typeof(T).GetProperties())
+        {
+            //Here we assume that every data member is decorated with a "DisplayAttribute" and "DataFieldAttribute".
+
+            var dataField = property.GetCustomAttributes(typeof(DataFieldAttribute), true).Cast<DataFieldAttribute>().First();
+            var disp = property.GetCustomAttributes(typeof(DisplayAttribute), true).Cast<DisplayAttribute>().First();
+
+            if (dataField.DataField != DataField.Navigation)
+            {
+                <MudTd DataLabel="@(disp.Name)">@property.GetValue(context)</MudTd>
+            }
+            else
+            {
+                <MudTd DataLabel="@(disp.Name)">
+                    <MudButton Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary">@(disp.Name)</MudButton>
+                </MudTd>
+            }
+        }
+    </RowTemplate>
+    <RowEditingTemplate>
+        @foreach (var property in typeof(T).GetProperties())
+        {
+            var dataField = property.GetCustomAttributes(typeof(DataFieldAttribute), true).Cast<DataFieldAttribute>().First();
+            var disp = property.GetCustomAttributes(typeof(DisplayAttribute), true).Cast<DisplayAttribute>().First();
+
+            switch (dataField.DataField)
+            {
+                case DataField.Empty:
+                    <MudTd DataLabel="@disp.Name">@property.GetValue(context)</MudTd>
+                    break;
+                case DataField.Text:
+                    <MudTextField Label="@(disp.Name)"
+                      T="string"
+                      Value="@(property.GetValue(context) as string)"
+                      ValueChanged="@((arg) => OnEditValueChangedHandler(context.Id, property.Name, arg))" Required />
+                    break;
+                case DataField.MultiLineText:
+                    <MudTextField Label="@(disp.Name)"
+                      Lines="3"
+                      T="string"
+                      Value="@(property.GetValue(context) as string)"
+                      ValueChanged="@((args) => OnEditValueChangedHandler(context.Id, property.Name, args))" Required />
+                    break;
+                case DataField.Currency:
+                case DataField.Number:
+                    <MudNumericField Label="@(disp.Name)"
+                         Lines="3"
+                         T="int"
+                         Value="@((int)property.GetValue(context))"
+                         ValueChanged="@((args) => OnEditValueChangedHandler(context.Id, property.Name, args))" Required />
+                    break;
+                case DataField.PhoneNumber:
+                    <MudTextField Label="@(disp.Name)"
+                      Mask="@(new PatternMask("000000000000000"))"
+                      T="object"
+                      Value="@property.GetValue(context)"
+                      ValueChanged="@((args) => OnEditValueChangedHandler(context.Id, property.Name, args))" Required />
+                    break;
+                case DataField.DateTime:
+                    <MudDatePicker Label="@(disp.Name)"
+                       Date="@((DateTime?)property.GetValue(context))"
+                       DateFormat="dd/MM/yyyy"
+                       DateChanged="@((args) => OnEditValueChangedHandler(context.Id, property.Name, args))" Required />
+                    break;
+                case DataField.Enum:
+                    <MudSelect T="object"
+                   Value="@property.GetValue(context)"
+                   ValueChanged="@((args) => OnEditValueChangedHandler(context.Id, property.Name, args))" Required>
+                        @foreach (var value in Enum.GetValues(property.PropertyType))
+                        {
+                            <MudSelectItem Value="@value" />
+                        }
+                    </MudSelect>
+                    break;
+                default:
+                    break;
+            }
+        }
+    </RowEditingTemplate>
+    <NoRecordsContent>
+        <MudText>No matching records found</MudText>
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudText>Loading...</MudText>
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    #region Services
+
+    [Inject] ODataCRUDHandler<T> ODataCRUDHandler { get; set; }
+
+    #endregion
+
+    #region Members
+
+    MudTable<T>? Table;
+    string? searchString;
+    T? EditBackupItem;
+    bool CanDelete = false;
+    HashSet<T> SelectedItems;
+
+    #endregion
+
+    #region Selection Events
+
+    void SelectedItemsChanged(HashSet<T> selectedItems)
+    {
+        CanDelete = selectedItems?.Count > 0 ? true : false;
+    }
+
+    #endregion
+
+    #region A,D
+
+    async void OnAddPatient()
+    {
+        var AddDialog = DialogService.Show<AddPatientDialog>("Add Patient");
+        var dialogResult = await AddDialog.Result;
+
+        if (!dialogResult.Cancelled)
+        {
+            var Data = dialogResult.Data;
+
+            var res = await ODataCRUDHandler.Post(Data as T);
+
+            if (res.Key == System.Net.HttpStatusCode.Created)
+            {
+                Snackbar.Add("Patient added successfully.", Severity.Success);
+                await Table.ReloadServerData();
+            }
+            else
+            {
+                if (res.Value != null)
+                {
+                    Snackbar.Add(res.Value.ToString(), Severity.Error);
+                }
+                else
+                {
+                    Snackbar.Add("Patient could not be added.", Severity.Error);
+                }
+            }
+        }
+    }
+
+    #endregion
+
+    #region Inline Editing
+
+    void ItemBackup(object item)
+    {
+        EditBackupItem = Mapper.Map<T>(item);
+    }
+
+    void OnItemEditCancel(object item)
+    {
+        Mapper.Map(EditBackupItem, item);
+    }
+
+    async void OnItemEditCommit(object item)
+    {
+        var res = await ODataCRUDHandler.Put(item as T);
+
+        if (res.Key == System.Net.HttpStatusCode.NoContent)
+        {
+            Snackbar.Add("Item updated successfully.", Severity.Success);
+            return;
+        }
+        else if (res.Key == System.Net.HttpStatusCode.BadRequest)
+        {
+            if (res.Value != null)
+            {
+                Snackbar.Add(res.Value.ToString(), Severity.Error);
+
+                await InvokeAsync(() =>
+                {
+                    ModelRestoreHelper.Restore<T>(res.Value, EditBackupItem, item as T);
+                    StateHasChanged();
+                });
+            }
+            else
+            {
+                Snackbar.Add("Bad request.", Severity.Error);
+            }
+
+            return;
+        }
+        else
+        {
+            Snackbar.Add("Internal server error.", Severity.Error);
+        }
+    }
+
+    #endregion
+
+    #region Serverside Processing
+
+    async Task<TableData<T>> ServerReload(TableState tableState)
+    {
+        var crudModel = Mapper.Map<CRUDModel>(tableState);
+        crudModel.SearchString = searchString;
+
+        var res = await ODataCRUDHandler.Get(crudModel);
+
+        return new TableData<T>() { TotalItems = res.Key, Items = res.Value };
+    }
+
+    async void OnSearch(string text)
+    {
+        searchString = text;
+        Table.NavigateTo(Page.First);
+        await Table.ReloadServerData();
+    }
+
+    #endregion
+
+    #region Value Changed Handlers
+
+    void OnEditValueChangedHandler(int Id, string name, object value)
+    {
+        var tableItem = Table.Items.Where(i => i.Id == Id).First();
+
+        tableItem.GetType().GetProperty(name).SetValue(tableItem, value);
+    }
+
+    #endregion
+}

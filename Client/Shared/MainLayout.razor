@@ -1,0 +1,53 @@
+﻿@using MudBlazor.Utilities
+@inherits LayoutComponentBase
+
+<AuthorizeView>
+    <Authorized>
+        <MudThemeProvider @bind-IsDarkMode="_isDarkMode" />
+        <MudDialogProvider FullWidth="true"
+                           MaxWidth="MaxWidth.Medium"
+                           CloseButton="true"
+                           DisableBackdropClick="true"
+                           Position="DialogPosition.Center"
+                           CloseOnEscapeKey="true" />
+        <MudSnackbarProvider />
+
+        <MudLayout>
+            <MudAppBar Elevation="0">
+                <MudIconButton Icon="@Icons.Material.Rounded.Menu" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+                @Config.GetSection("AppName").Value
+                <MudSpacer />
+                <MudIconButton Icon="@_darkModeBtn" Edge="Edge.End" OnClick="@((e) => DarkModeToggle())" />
+            </MudAppBar>
+            <MudDrawer @bind-Open="@_drawerOpen">
+                <NavMenu />
+            </MudDrawer>
+            <MudMainContent>
+                <MudContainer Class="py-6" MaxWidth="MaxWidth.ExtraLarge">
+                    @Body
+                </MudContainer>
+            </MudMainContent>
+        </MudLayout>
+    </Authorized>
+    <NotAuthorized>
+        <RedirectToLogin />
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    bool _drawerOpen = true;
+    bool _isDarkMode = false;
+    string _darkModeBtn = Icons.Material.Rounded.DarkMode;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    void DarkModeToggle()
+    {
+        _isDarkMode = !_isDarkMode;
+        _darkModeBtn = _darkModeBtn == Icons.Material.Rounded.DarkMode
+        ? Icons.Material.Rounded.LightMode : Icons.Material.Rounded.DarkMode;
+    }
+}

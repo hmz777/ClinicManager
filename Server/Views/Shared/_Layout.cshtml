@@ -1,0 +1,18 @@
+﻿<!DOCTYPE html>
+
+<html lang="en-us">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    @await Html.PartialAsync("Styles")
+    @await RenderSectionAsync("Styles", false)
+    <title>@ViewBag.Title</title>
+</head>
+<body>
+    <main>
+        @RenderBody()
+    </main>
+
+    @await Html.PartialAsync("Scripts")
+    @await RenderSectionAsync("Scripts", false)
+</body>
+</html>

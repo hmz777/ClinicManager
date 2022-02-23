@@ -1,0 +1,51 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using System.Security.Claims
+
+@inject NavigationManager Navigation
+@inject SignOutSessionStateManager SignOutManager
+
+<MudNavMenu Margin="Margin.Normal" Rounded="true" Class="pa-2">
+    <MudText Typo="Typo.h6" Class="px-4">@Config.GetSection("AppName").Value</MudText>
+    <MudText Typo="Typo.body2" Class="px-4 mud-text-secondary">
+        v@(System.Reflection.Assembly
+        .GetExecutingAssembly()?
+        .GetName()?
+        .Version?
+        .ToString())
+    </MudText>
+    <MudDivider Class="my-2" />
+    @if (User != null)
+    {
+        <MudButton StartIcon="@Icons.Material.Outlined.LightbulbCircle" FullWidth="true" Variant="Variant.Filled" Color="Color.Primary" Class="px-4 mb-4" Link="authentication/profile">@User.Identity?.Name</MudButton>
+        <MudButton StartIcon="@Icons.Material.Outlined.Logout" FullWidth="true" Variant="Variant.Filled" Color="Color.Primary" OnClick="@BeginSignOut">Log out</MudButton>
+    }
+    <MudDivider Class="my-2" />
+    <MudNavLink Href="/" Icon="@Icons.Outlined.Dashboard" Match="NavLinkMatch.All">Dashboard</MudNavLink>
+    <MudNavLink Href="/patients" Icon="@Icons.Outlined.SupervisedUserCircle" Match="NavLinkMatch.Prefix">Patients</MudNavLink>
+    <MudNavLink Href="/appointments" Icon="@Icons.Outlined.PunchClock" Match="NavLinkMatch.Prefix">Appointments</MudNavLink>
+    <MudNavLink Href="/treatments" Icon="@Icons.Outlined.CallToAction" Match="NavLinkMatch.Prefix">Treatments</MudNavLink>
+    <MudNavLink Href="/payments" Icon="@Icons.Outlined.Money" Match="NavLinkMatch.Prefix">Payments</MudNavLink>
+    <MudNavGroup Icon="@Icons.Filled.Settings" Title="Settings" Expanded="false">
+        <MudNavLink Icon="@Icons.Outlined.VerifiedUser" Href="/users" Match="NavLinkMatch.Prefix">Users</MudNavLink>
+        <MudNavLink Icon="@Icons.Outlined.Security" Href="/security" Match="NavLinkMatch.Prefix">Security</MudNavLink>
+    </MudNavGroup>
+    <MudNavLink Icon="@Icons.Outlined.Info" Href="/about" Match="NavLinkMatch.Prefix">About</MudNavLink>
+</MudNavMenu>
+
+@code {
+    [CascadingParameter] Task<AuthenticationState>? AuthenticationState { get; set; }
+    ClaimsPrincipal? User;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var state = await AuthenticationState;
+        User = state?.User;
+    }
+
+    async Task BeginSignOut(MouseEventArgs args)
+    {
+        await SignOutManager.SetSignOutState();
+        Navigation.NavigateTo("authentication/logout");
+    }
+}

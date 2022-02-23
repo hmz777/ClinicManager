@@ -1,0 +1,11 @@
+﻿[
+  {
+    "outputFile": "wwwroot/css/main.client.css",
+    "inputFile": "Sass/main.scss",
+    "minify": { "enabled": true },
+    "options": {
+      "sourceMap": true,
+      "relativeUrls": true
+    }
+  }
+]

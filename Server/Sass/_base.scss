@@ -1,0 +1,14 @@
+﻿html {
+    font-size: 1rem;
+}
+
+html, body, main {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-flow: column wrap;
+}
+
+body {
+    background-color: $accent;
+}

@@ -1,0 +1,251 @@
+﻿@page "/patients"
+@using ClinicProject.Client.Helpers
+@using ClinicProject.Client.Models.CRUD
+@using ClinicProject.Client.Services
+@using ClinicProject.Client.Shared.Patients
+@using ClinicProject.Shared.DTOs
+@using System
+@using ClinicProject.Shared.Models.Error
+@using ClinicProject.Shared.Models.Patient
+
+<MudTable @ref="@Table"
+          ServerData="@(new Func<TableState, Task<TableData<PatientDTO>>>(ServerReload))"
+          CanCancelEdit="true"
+          Hover="true"
+          Breakpoint="Breakpoint.LgAndDown"
+          LoadingProgressColor="Color.Primary"
+          T="PatientDTO"
+          MultiSelection="true"
+          FixedHeader="true"
+          FixedFooter="true"
+          RowsPerPage="10"
+          RowEditPreview="ItemBackup"
+          RowEditCancel="OnItemEditCancel"
+          RowEditCommit="OnItemEditCommit"
+          IsEditRowSwitchingBlocked="true"
+          SelectedItems="SelectedItems"
+          SelectedItemsChanged="SelectedItemsChanged">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Patients</MudText>
+        <MudPaper Class="ml-3" Elevation="0">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OnAddPatient">Add Patient</MudButton>
+            <MudButton Disabled="@(!CanDelete)" Variant="Variant.Filled" Color="Color.Error">Delete</MudButton>
+        </MudPaper>
+        <MudSpacer />
+        <MudTextField T="string" ValueChanged="@(s=> OnSearch(s))" Placeholder="Search patients" Adornment="Adornment.Start"
+                      AdornmentIcon="@Icons.Material.Outlined.Search" AdornmentColor="Color.Primary" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <ColGroup>
+        <col />
+        <col />
+        <col style="width:15%;" />
+        <col style="width:20%;" />
+        <col style="width:15%;" />
+        <col />
+        <col />
+        <col style="width:15%;" />
+        <col />
+        <col />
+        <col />
+        <col />
+    </ColGroup>
+    <HeaderContent>
+        <MudTh><MudTableSortLabel SortLabel="Id" T="PatientDTO">Id</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="FirstName" T="PatientDTO">First Name</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="MiddleName" T="PatientDTO">Middle Name</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="LastName" T="PatientDTO">Last Name</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="Age" T="PatientDTO">Age</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="Gender" T="PatientDTO">Gender</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortLabel="PhoneNumber" T="PatientDTO">Phone Number</MudTableSortLabel></MudTh>
+        <MudTh>Appointments</MudTh>
+        <MudTh>Treatments</MudTh>
+        <MudTh>Notes</MudTh>
+        <MudTh>Extra Data</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="@nameof(context.Id)">@context.Id</MudTd>
+        <MudTd DataLabel="@nameof(context.FirstName)">@context.FirstName</MudTd>
+        <MudTd DataLabel="@nameof(context.MiddleName)">@context.MiddleName</MudTd>
+        <MudTd DataLabel="@nameof(context.LastName)">@context.LastName</MudTd>
+        <MudTd DataLabel="@nameof(context.Age)">@context.Age</MudTd>
+        <MudTd DataLabel="@nameof(context.Gender)">@context.Gender</MudTd>
+        <MudTd DataLabel="@nameof(context.PhoneNumber)">@context.PhoneNumber</MudTd>
+        <MudTd DataLabel="@nameof(context.Appointments)">
+            <MudButton Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary">@nameof(context.Appointments)</MudButton>
+        </MudTd>
+        <MudTd DataLabel="@nameof(context.Treatments)">
+            <MudButton Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary">@nameof(context.Treatments)</MudButton>
+        </MudTd>
+        <MudTd DataLabel="@nameof(context.Notes)">
+            <MudButton Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary">@nameof(context.Notes)</MudButton>
+        </MudTd>
+        <MudTd DataLabel="@nameof(context.ExtraData)">
+            <MudButton Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary">@nameof(context.ExtraData)</MudButton>
+        </MudTd>
+    </RowTemplate>
+    <RowEditingTemplate>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="FirstName">
+            <MudTextField MaxLength="40" @bind-Value="@context.FirstName" Required />
+        </MudTd>
+        <MudTd DataLabel="MiddleName">
+            <MudTextField MaxLength="40" @bind-Value="@context.MiddleName" Required />
+        </MudTd>
+        <MudTd DataLabel="LastName">
+            <MudTextField MaxLength="40" @bind-Value="@context.LastName" Required />
+        </MudTd>
+        <MudTd DataLabel="Age">
+            <MudNumericField Min="1" Max="110" @bind-Value="@context.Age" Required />
+        </MudTd>
+        <MudTd DataLabel="Gender">
+            <MudSelect T="Gender" AnchorOrigin="Origin.BottomCenter" @bind-Value="@context.Gender" Required>
+                @foreach (var value in Enum.GetValues<Gender>())
+                {
+                    <MudSelectItem Value="@value" />
+                }
+            </MudSelect>
+        </MudTd>
+        <MudTd DataLabel="PhoneNumber">
+            <MudTextField Mask="@(new PatternMask("000000000000000"))" @bind-Value="@context.PhoneNumber" Required />
+        </MudTd>
+    </RowEditingTemplate>
+    <NoRecordsContent>
+        <MudText>No matching records found</MudText>
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudText>Loading...</MudText>
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    #region Services
+
+    [Inject] ODataCRUDHandler<PatientDTO> ODataCRUDHandler { get; set; }
+
+    #endregion
+
+    #region Members
+
+    MudTable<PatientDTO>? Table;
+    string? searchString;
+    PatientDTO? EditBackupItem;
+    bool CanDelete = false;
+    HashSet<PatientDTO> SelectedItems;
+
+    #endregion
+
+    #region Selection Events
+
+    void SelectedItemsChanged(HashSet<PatientDTO> selectedItems)
+    {
+        CanDelete = selectedItems?.Count > 0 ? true : false;
+    }
+
+    #endregion
+
+    #region A,D
+
+    async void OnAddPatient()
+    {
+        var AddDialog = DialogService.Show<AddPatientDialog>("Add Patient");
+        var dialogResult = await AddDialog.Result;
+
+        if (!dialogResult.Cancelled)
+        {
+            var Data = dialogResult.Data;
+
+            var res = await ODataCRUDHandler.Post(Data as PatientDTO);
+
+            if (res.Key == System.Net.HttpStatusCode.Created)
+            {
+                Snackbar.Add("Patient added successfully.", Severity.Success);
+                await Table.ReloadServerData();
+            }
+            else
+            {
+                if (res.Value != null)
+                {
+                    Snackbar.Add(res.Value.ToString(), Severity.Error);
+                }
+                else
+                {
+                    Snackbar.Add("Patient could not be added.", Severity.Error);
+                }
+            }
+        }
+    }
+
+    #endregion
+
+    #region Inline Editing
+
+    void ItemBackup(object item)
+    {
+        EditBackupItem = Mapper.Map<PatientDTO>(item);
+    }
+
+    void OnItemEditCancel(object item)
+    {
+        Mapper.Map(EditBackupItem, item);
+    }
+
+    async void OnItemEditCommit(object item)
+    {
+        var res = await ODataCRUDHandler.Put(item as PatientDTO);
+
+        if (res.Key == System.Net.HttpStatusCode.NoContent)
+        {
+            Snackbar.Add("Item updated successfully.", Severity.Success);
+            return;
+        }
+        else if (res.Key == System.Net.HttpStatusCode.BadRequest)
+        {
+            if (res.Value != null)
+            {
+                Snackbar.Add(res.Value.ToString(), Severity.Error);
+
+                await InvokeAsync(() =>
+                {
+                    ModelRestoreHelper.Restore<PatientDTO>(res.Value, EditBackupItem, item as PatientDTO);
+                    StateHasChanged();
+                });
+            }
+            else
+            {
+                Snackbar.Add("Bad request.", Severity.Error);
+            }
+
+            return;
+        }
+        else
+        {
+            Snackbar.Add("Internal server error.", Severity.Error);
+        }
+    }
+
+    #endregion
+
+    #region Serverside Processing
+
+    async Task<TableData<PatientDTO>> ServerReload(TableState tableState)
+    {
+        var crudModel = Mapper.Map<CRUDModel>(tableState);
+        crudModel.SearchString = searchString;
+
+        var res = await ODataCRUDHandler.Get(crudModel);
+
+        return new TableData<PatientDTO>() { TotalItems = res.Key, Items = res.Value };
+    }
+
+    async void OnSearch(string text)
+    {
+        searchString = text;
+        Table.NavigateTo(Page.First);
+        await Table.ReloadServerData();
+    }
+
+    #endregion
+}

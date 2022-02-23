@@ -1,0 +1,25 @@
+﻿@using ClinicProject.Server.Helpers
+
+@{
+    var message = TempData.Get<StatusMessage>("Message");
+
+    if (message != null)
+    {
+        var status = message.MessageStatus switch
+        {
+            MessageStatus.Error => "danger",
+            MessageStatus.Information => "info",
+            MessageStatus.Warning => "warning",
+            MessageStatus.Success => "success",
+
+            _ => "danger"
+        };
+
+
+        <div class="status-message">
+            <div class="alert alert-@status ">
+                @message.Message
+            </div>
+        </div>
+    }
+}
