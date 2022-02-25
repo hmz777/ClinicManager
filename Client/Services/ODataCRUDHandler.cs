@@ -26,7 +26,7 @@ namespace ClinicProject.Client.Services
             this.jsonOptions = jsonOptions;
         }
 
-        public async Task<KeyValuePair<int, List<T>>> Get(CRUDModel crudModel)
+        public async Task<KeyValuePair<int, IEnumerable<T>>> Get(CRUDModel crudModel)
         {
             var fullUrl = ConstructUrl(ConstructQuery(crudModel));
 
@@ -40,7 +40,7 @@ namespace ClinicProject.Client.Services
 
             var count = json?.RootElement.GetProperty("@odata.count").GetInt32() ?? 0;
 
-            return new KeyValuePair<int, List<T>>(count, Elements);
+            return new KeyValuePair<int, IEnumerable<T>>(count, Elements);
         }
 
         public async Task<KeyValuePair<HttpStatusCode, ModelValidationResult?>> Put(T Item)
