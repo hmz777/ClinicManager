@@ -8,7 +8,43 @@
 @using ClinicProject.Shared.Models.Error
 @using ClinicProject.Shared.Models.Patient
 @using System.ComponentModel.DataAnnotations
+@using System.Reflection
 @typeparam T where T : DTOBase
+
+<MudPaper Class="py-4 px-4 mb-5">
+    <MudGrid>
+        <MudItem xs="12">
+            <MudText Typo="Typo.h6">Filters</MudText>
+        </MudItem>
+        <MudItem xs="6">
+            <MudPaper Elevation="0">
+                <MudTextField Label="Search Patients" T="string" ValueChanged="@(s=> OnSearch(s))" Variant="Variant.Outlined" Adornment="Adornment.End"
+                              AdornmentIcon="@Icons.Material.Outlined.Search" AdornmentColor="Color.Primary" IconSize="Size.Medium"></MudTextField>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="6">
+            <MudPaper Class="d-flex" Elevation="0">
+                <MudDatePicker Class="mr-2" Variant="Variant.Outlined" Label="From Date" @bind-Date="DateFrom" DateFormat="dd/MM/yyyy" />
+                <MudDatePicker Variant="Variant.Outlined" Label="To Date" @bind-Date="DateFrom" DateFormat="dd/MM/yyyy" />
+            </MudPaper>
+            <MudPaper Elevation="0" Class="mt-2">
+                <MudButton StartIcon="@Icons.Material.Outlined.DateRange" Variant="Variant.Filled" Color="Color.Primary">Filter by date</MudButton>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" Class="py-2">
+            <MudDivider />
+        </MudItem>
+        <MudItem xs="12">
+            <MudPaper Elevation="0">
+                <MudButton StartIcon="@Icons.Material.Outlined.Add" Variant="Variant.Filled" Color="Color.Primary" OnClick="OnAddPatient">Add Patient</MudButton>
+                <MudButton StartIcon="@Icons.Material.Outlined.Edit" Disabled="@(!CanEdit)" Variant="Variant.Filled" Color="Color.Warning">Edit Patient</MudButton>
+                <MudButton StartIcon="@Icons.Material.Outlined.Delete" Disabled="@(!CanDelete)" Variant="Variant.Filled" Color="Color.Error">Delete</MudButton>
+                <MudButton StartIcon="@Icons.Material.Outlined.SelectAll" Disabled="@(!CanSelectAll)" Variant="Variant.Filled" Color="Color.Secondary" OnClick="SelectAll">Select All</MudButton>
+                <MudButton StartIcon="@Icons.Material.Outlined.ClearAll" Disabled="@(!CanClearSelection)" Variant="Variant.Filled" Color="Color.Secondary" OnClick="ClearSelection">Clear Selection</MudButton>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudPaper>
 
 <MudTable @ref="@Table"
           ServerData="@(new Func<TableState, Task<TableData<T>>>(ServerReload))"
@@ -20,7 +56,6 @@
           MultiSelection="true"
           FixedHeader="true"
           FixedFooter="true"
-          RowsPerPage="10"
           RowEditPreview="ItemBackup"
           RowEditCancel="OnItemEditCancel"
           RowEditCommit="OnItemEditCommit"
@@ -29,13 +64,6 @@
           SelectedItemsChanged="SelectedItemsChanged">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Patients</MudText>
-        <MudPaper Class="ml-3" Elevation="0">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OnAddPatient">Add Patient</MudButton>
-            <MudButton Disabled="@(!CanDelete)" Variant="Variant.Filled" Color="Color.Error">Delete</MudButton>
-        </MudPaper>
-        <MudSpacer />
-        <MudTextField T="string" ValueChanged="@(s=> OnSearch(s))" Placeholder="Search patients" Adornment="Adornment.Start"
-                      AdornmentIcon="@Icons.Material.Outlined.Search" AdornmentColor="Color.Primary" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <ColGroup>
         <col />
@@ -52,117 +80,122 @@
         <col />
     </ColGroup>
     <HeaderContent>
-        <MudTh><MudTableSortLabel SortLabel="Id" T="PatientDTO">Id</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel SortLabel="FirstName" T="PatientDTO">First Name</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel SortLabel="MiddleName" T="PatientDTO">Middle Name</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel SortLabel="LastName" T="PatientDTO">Last Name</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel SortLabel="Age" T="PatientDTO">Age</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel SortLabel="Gender" T="PatientDTO">Gender</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel SortLabel="PhoneNumber" T="PatientDTO">Phone Number</MudTableSortLabel></MudTh>
-        <MudTh>Appointments</MudTh>
-        <MudTh>Treatments</MudTh>
-        <MudTh>Notes</MudTh>
-        <MudTh>Extra Data</MudTh>
-        @foreach (var property in typeof(T).GetProperties())
+        @foreach (var property in PropertyAttributes)
         {
-            var dataField = property.GetCustomAttributes(typeof(DataFieldAttribute), true).Cast<DataFieldAttribute>().First();
-            var disp = property.GetCustomAttributes(typeof(DisplayAttribute), true).Cast<DisplayAttribute>().First();
-
-            if (dataField.DataField != DataField.Navigation)
+            if (property.Value.Item2 != null)
             {
-                <MudTh><MudTableSortLabel T="T" SortLabel="@(disp.Name)">@disp.Name</MudTableSortLabel></MudTh>
-            }
-            else
-            {
-                <MudTh>@disp.Name</MudTh>
+                if (property.Value.Item2.DataField != DataField.Navigation)
+                {
+                    <MudTh><MudTableSortLabel T="T" SortLabel="@(property.Key.Name)">@property.Value.Item1.Name</MudTableSortLabel></MudTh>
+                }
+                else
+                {
+                    <MudTh>@property.Value.Item1.Name</MudTh>
+                }
             }
         }
     </HeaderContent>
     <RowTemplate>
-        @foreach (var property in typeof(T).GetProperties())
+        @foreach (var property in PropertyAttributes)
         {
-            //Here we assume that every data member is decorated with a "DisplayAttribute" and "DataFieldAttribute".
-
-            var dataField = property.GetCustomAttributes(typeof(DataFieldAttribute), true).Cast<DataFieldAttribute>().First();
-            var disp = property.GetCustomAttributes(typeof(DisplayAttribute), true).Cast<DisplayAttribute>().First();
-
-            if (dataField.DataField != DataField.Navigation)
+            if (property.Value.Item2 != null)
             {
-                <MudTd DataLabel="@(disp.Name)">@property.GetValue(context)</MudTd>
-            }
-            else
-            {
-                <MudTd DataLabel="@(disp.Name)">
-                    <MudButton Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary">@(disp.Name)</MudButton>
-                </MudTd>
+                if (property.Value.Item2.DataField != DataField.Navigation)
+                {
+                    if (property.Key.PropertyType == typeof(DateTime))
+                    {
+                        <MudTd DataLabel="@(property.Key.Name)">@context.DateValues[property.Key.Name]?.ToString("dd/MM/yyyy")</MudTd>
+                    }
+                    else
+                    {
+                        <MudTd DataLabel="@(property.Key.Name)">@property.Key.GetValue(context)</MudTd>
+                    }
+                }
+                else
+                {
+                    <MudTd DataLabel="@(property.Key.Name)">
+                        <MudButton Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary">View</MudButton>
+                    </MudTd>
+                }
             }
         }
     </RowTemplate>
     <RowEditingTemplate>
-        @foreach (var property in typeof(T).GetProperties())
+        @foreach (var property in PropertyAttributes)
         {
-            var dataField = property.GetCustomAttributes(typeof(DataFieldAttribute), true).Cast<DataFieldAttribute>().First();
-            var disp = property.GetCustomAttributes(typeof(DisplayAttribute), true).Cast<DisplayAttribute>().First();
-
-            switch (dataField.DataField)
+            if (property.Value.Item2 != null)
             {
-                case DataField.Empty:
-                    <MudTd DataLabel="@disp.Name">@property.GetValue(context)</MudTd>
-                    break;
-                case DataField.Text:
-                    <MudTextField Label="@(disp.Name)"
-                      T="string"
-                      Value="@(property.GetValue(context) as string)"
-                      ValueChanged="@((arg) => OnEditValueChangedHandler(context.Id, property.Name, arg))" Required />
-                    break;
-                case DataField.MultiLineText:
-                    <MudTextField Label="@(disp.Name)"
-                      Lines="3"
-                      T="string"
-                      Value="@(property.GetValue(context) as string)"
-                      ValueChanged="@((args) => OnEditValueChangedHandler(context.Id, property.Name, args))" Required />
-                    break;
-                case DataField.Currency:
-                case DataField.Number:
-                    <MudNumericField Label="@(disp.Name)"
-                         Lines="3"
-                         T="int"
-                         Value="@((int)property.GetValue(context))"
-                         ValueChanged="@((args) => OnEditValueChangedHandler(context.Id, property.Name, args))" Required />
-                    break;
-                case DataField.PhoneNumber:
-                    <MudTextField Label="@(disp.Name)"
-                      Mask="@(new PatternMask("000000000000000"))"
-                      T="object"
-                      Value="@property.GetValue(context)"
-                      ValueChanged="@((args) => OnEditValueChangedHandler(context.Id, property.Name, args))" Required />
-                    break;
-                case DataField.DateTime:
-                    <MudDatePicker Label="@(disp.Name)"
-                       Date="@((DateTime?)property.GetValue(context))"
-                       DateFormat="dd/MM/yyyy"
-                       DateChanged="@((args) => OnEditValueChangedHandler(context.Id, property.Name, args))" Required />
-                    break;
-                case DataField.Enum:
-                    <MudSelect T="object"
-                   Value="@property.GetValue(context)"
-                   ValueChanged="@((args) => OnEditValueChangedHandler(context.Id, property.Name, args))" Required>
-                        @foreach (var value in Enum.GetValues(property.PropertyType))
-                        {
-                            <MudSelectItem Value="@value" />
-                        }
-                    </MudSelect>
-                    break;
-                default:
-                    break;
+                if (property.Value.Item2.Editable)
+                {
+                    switch (property.Value.Item2.DataField)
+                    {
+                        case DataField.Text:
+                            <MudTd>
+                                <MudTextField Label="@(property.Value.Item1.Name)"
+                          @bind-Value="@(context.StringValues[property.Key.Name])" Required />
+                            </MudTd>
+                            break;
+                        case DataField.MultiLineText:
+                            <MudTd>
+                                <MudTextField Label="@(property.Value.Item1.Name)"
+                          Lines="3"
+                          @bind-Value="@(context.StringValues[property.Key.Name])" Required />
+                            </MudTd>
+                            break;
+                        case DataField.Currency:
+                        case DataField.Number:
+                            <MudTd>
+                                <MudNumericField Label="@(property.Value.Item1.Name)"
+                             @bind-Value="@(context.IntValues[property.Key.Name])" Required />
+                            </MudTd>
+                            break;
+                        case DataField.PhoneNumber:
+                            <MudTd>
+                                <MudTextField Label="@(property.Value.Item1.Name)"
+                          Mask="@(new PatternMask("000000000000000"))"
+                          @bind-Value="@(context.StringValues[property.Key.Name])" Required />
+                            </MudTd>
+                            break;
+                        case DataField.DateTime:
+                            <MudTd>
+                                <MudDatePicker Label="@(property.Value.Item1.Name)"
+                           DateFormat="dd/MM/yyyy"
+                           @bind-Date="@(context.DateValues[property.Key.Name])" Required />
+                            </MudTd>
+                            break;
+                        case DataField.Enum:
+                            <MudTd>
+                                <MudSelect @bind-Value="@(context.ObjectValues[property.Key.Name])" Required>
+                                    @foreach (var value in Enum.GetValues(property.Key.PropertyType))
+                                    {
+                    <MudSelectItem Value="@value" />
+                                    }
+            </MudSelect>
+        </MudTd>
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else if (property.Value.Item2.EditPreview)
+                {
+                    if (property.Key.PropertyType == typeof(DateTime))
+                    {
+                        <MudTd DataLabel="@(property.Key.Name)">@context.DateValues[property.Key.Name]?.ToString("dd/MM/yyyy")</MudTd>
+                    }
+                    else
+                    {
+                        <MudTd DataLabel="@(property.Key.Name)">@property.Key.GetValue(context)</MudTd>
+                    }
+                }
             }
         }
     </RowEditingTemplate>
     <NoRecordsContent>
-        <MudText>No matching records found</MudText>
+        <MudText> No matching records found </MudText>
     </NoRecordsContent>
     <LoadingContent>
-        <MudText>Loading...</MudText>
+        <MudText> Loading...</MudText>
     </LoadingContent>
     <PagerContent>
         <MudTablePager />
@@ -178,11 +211,42 @@
 
     #region Members
 
+    Dictionary<PropertyInfo, (DisplayAttribute, DataFieldAttribute)> PropertyAttributes = new();
+
     MudTable<T>? Table;
+    IEnumerable<T> Items = new HashSet<T>();
+    HashSet<T> SelectedItems = new();
+
     string? searchString;
     T? EditBackupItem;
+
     bool CanDelete = false;
-    HashSet<T> SelectedItems;
+    bool CanEdit = false;
+    bool CanSelectAll = true;
+    bool CanClearSelection = false;
+
+    DateTime? DateFrom { get; set; }
+    DateTime? DateTo { get; set; }
+
+    #endregion
+
+    #region Life Cycle
+
+    protected override void OnInitialized()
+    {
+        foreach (var property in typeof(T).GetProperties())
+        {
+            var dataField = property.GetCustomAttributes(typeof(DataFieldAttribute), true).Cast<DataFieldAttribute>().FirstOrDefault();
+            var disp = property.GetCustomAttributes(typeof(DisplayAttribute), true).Cast<DisplayAttribute>().FirstOrDefault();
+
+            PropertyAttributes[property] = (disp, dataField);
+        }
+
+        PropertyAttributes = PropertyAttributes
+          .OrderByDescending(p => p.Key.Name.ToLower().StartsWith('i'))
+          .ThenByDescending(p => p.Value.Item2?.DataField != DataField.Navigation)
+          .ToDictionary(p => p.Key, p => p.Value);
+    }
 
     #endregion
 
@@ -190,7 +254,20 @@
 
     void SelectedItemsChanged(HashSet<T> selectedItems)
     {
-        CanDelete = selectedItems?.Count > 0 ? true : false;
+        CanDelete = SelectedItems?.Count > 0;
+        CanEdit = SelectedItems?.Count == 1;
+        CanSelectAll = SelectedItems?.Count == 0;
+        CanClearSelection = SelectedItems?.Count > 0;
+    }
+
+    void SelectAll()
+    {
+        SelectedItems = Items.ToHashSet<T>();
+    }
+
+    void ClearSelection()
+    {
+        SelectedItems.Clear();
     }
 
     #endregion
@@ -281,10 +358,13 @@
 
     async Task<TableData<T>> ServerReload(TableState tableState)
     {
+        ClearSelection();
+
         var crudModel = Mapper.Map<CRUDModel>(tableState);
         crudModel.SearchString = searchString;
 
         var res = await ODataCRUDHandler.Get(crudModel);
+        Items = res.Value;
 
         return new TableData<T>() { TotalItems = res.Key, Items = res.Value };
     }
@@ -308,4 +388,4 @@
     }
 
     #endregion
-}
+        }
