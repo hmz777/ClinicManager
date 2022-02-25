@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.OData.UriParser;
-using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq.Expressions;
 
 namespace ClinicProject.Server.OData
@@ -32,7 +32,7 @@ namespace ClinicProject.Server.OData
             {
                 var propType = property.PropertyType;
 
-                if (property.GetCustomAttributes(typeof(DataTypeAttribute), true).Length >= 1)
+                if (property.GetCustomAttributes(typeof(NotMappedAttribute), true).Length >= 1)
                     continue;
 
                 if (propType == typeof(int))
