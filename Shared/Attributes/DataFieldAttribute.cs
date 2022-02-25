@@ -3,11 +3,15 @@
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
     public class DataFieldAttribute : Attribute
     {
-        public DataFieldAttribute(DataField DataField)
+        public DataFieldAttribute(DataField DataField, bool Editable = false, bool EditPreview = false)
         {
             this.DataField = DataField;
+            this.Editable = Editable;
         }
 
+
         public DataField DataField { get; }
+        public bool Editable { get; }
+        public bool EditPreview { get; set; }
     }
 }
