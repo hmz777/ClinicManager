@@ -11,7 +11,11 @@ namespace ClinicProject.Client.Helpers
         {
             public Patient2Patient()
             {
-                CreateMap<PatientDTO, PatientDTO>();
+                CreateMap<PatientDTO, PatientDTO>()
+                    .ForMember(d => d.StringValues, opt => opt.Ignore())
+                    .ForMember(d => d.IntValues, opt => opt.Ignore())
+                    .ForMember(d => d.DateValues, opt => opt.Ignore())
+                    .ForMember(d => d.ObjectValues, opt => opt.Ignore());
             }
         }
 
