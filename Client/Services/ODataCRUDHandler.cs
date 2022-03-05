@@ -105,10 +105,14 @@ namespace ClinicProject.Client.Services
             return res.StatusCode;
         }
 
-        //public async Task<HttpStatusCode> Batch(ODataBatchRequestModel requestModel)
-        //{
+        public async Task<ODataBatchResponseModel> Batch(ODataBatchRequestModel<T> batchModel)
+        {
+            var res = await httpClient.PostAsJsonAsync<ODataBatchRequestModel<T>>(
+                discoveryService.BatchingEndpoint + "$batch"
+                , batchModel);
 
-        //}
+            return await res.Content.ReadFromJsonAsync<ODataBatchResponseModel>();
+        }
 
         string ConstructQuery(CRUDModel crudModel)
         {
