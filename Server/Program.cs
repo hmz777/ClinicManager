@@ -13,7 +13,6 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 if (builder.Configuration.GetSection("ConnectionStrings:Active").Value == "Postgres")
 {
     var connectionString = builder.Configuration.GetConnectionString("Postgres");
@@ -48,32 +47,44 @@ builder.Services.AddAuthentication()
     .AddIdentityServerJwt();
 
 builder.Services.AddLocalization();
+
 builder.Services.AddControllersWithViews(options =>
     {
         options.ModelBinderProviders.Insert(0, new CustomModelBinderProvider());
     })
-    .AddOData(opt =>
+    .AddJsonOptions(options =>
     {
-        opt.AddRouteComponents("oapi",
-            new OdataModelBuilder().GetEDM(),
-            services => services.AddSingleton<ISearchBinder, ODataSearch>());
-
-        opt.AddRouteComponents("oapi_b",
-           new OdataModelBuilder().GetEDM(),
-           new DefaultODataBatchHandler());
-
-        opt.EnableQueryFeatures();
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
     })
-    .AddDataAnnotationsLocalization(options =>
-    {
-        options.DataAnnotationLocalizerProvider = (type, factory) =>
-            factory.Create(typeof(SharedResources));
-    })
-    .AddRazorRuntimeCompilation();
+.AddOData(opt =>
+{
+    var batchHandler = new DefaultODataBatchHandler();
+    batchHandler.MessageQuotas.MaxNestingDepth = 2;
+    batchHandler.MessageQuotas.MaxReceivedMessageSize = 100;
+    batchHandler.MessageQuotas.MaxOperationsPerChangeset = 10;
+
+    opt.AddRouteComponents("oapi",
+        new OdataModelBuilder().GetEDM(),
+       services => services.AddSingleton<ISearchBinder, ODataSearch>());
+
+    opt.AddRouteComponents("oapi_b",
+       new OdataModelBuilder().GetEDM(),
+       batchHandler);
+
+    opt.EnableQueryFeatures();
+})
+.AddDataAnnotationsLocalization(options =>
+{
+    options.DataAnnotationLocalizerProvider = (type, factory) =>
+        factory.Create(typeof(SharedResources));
+})
+.AddRazorRuntimeCompilation();
 
 builder.Services.AddRazorPages();
 
 builder.Services.AddAutoMapper(System.Reflection.Assembly.GetExecutingAssembly());
+
+builder.Services.AddHttpContextAccessor();
 
 if (builder.Environment.IsDevelopment())
 {
@@ -87,6 +98,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
     app.UseWebAssemblyDebugging();
+    app.UseODataRouteDebug();
 
     using (var scope = app.Services.CreateScope())
     {
@@ -108,6 +120,8 @@ app.UseStaticFiles();
 
 app.UseODataBatching();
 app.UseRouting();
+
+app.UseMiddleware<ODataHttpContextFixer>();
 
 var supportedCultures = new[] { "en-US", "ar-SY" };
 var localizationOptions = new RequestLocalizationOptions().SetDefaultCulture(supportedCultures[0])
