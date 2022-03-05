@@ -1,15 +1,71 @@
-﻿namespace ClinicProject.Client.Models.CRUD
+﻿using ClinicProject.Client.Services;
+using System.Text.Json.Serialization;
+
+namespace ClinicProject.Client.Models.CRUD
 {
-    public class ODataBatchRequestModel
+    public class ODataBatchRequestModel<T>
     {
-        public List<ODataBatchRequest> Requests { get; set; }
+        public List<ODataBatchRequest<T>> Requests { get; set; } = new();
+
+        public bool HasRequests()
+        {
+            return Requests != null && Requests.Count > 0;
+        }
     }
 
-    public class ODataBatchRequest
+    public class ODataBatchRequest<T>
     {
-        public Guid Id { get; set; }
-        public HttpMethod HttpMethod { get; set; }
-        public string Url { get; set; }
-        public string[] Headers { get; set; }
+        public ODataBatchRequest(HttpMethod httpMethod, T body, object key)
+        {
+            RequestId = Guid.NewGuid();
+            Url = APIDiscoveryService.APIDefinitionDocument.GetEndpoint<T>();
+            HttpMethod = httpMethod.Method;
+            Body = body;
+            Key = key;
+
+            switch (httpMethod)
+            {
+                case HttpMethod m when m == System.Net.Http.HttpMethod.Get:
+                    {
+                        Headers = new() { ["Accept"] = "application/json", ["Content-Type"] = "application/json" };
+                        break;
+                    }
+                case HttpMethod m when m == System.Net.Http.HttpMethod.Post:
+                    {
+                        Headers = new() { ["Accept"] = "application/json", ["Content-Type"] = "application/json;odata.metadata=minimal" };
+                        break;
+                    }
+                case HttpMethod m when m == System.Net.Http.HttpMethod.Put:
+                case HttpMethod mm when mm == System.Net.Http.HttpMethod.Delete:
+                    {
+                        Headers = new() { ["Accept"] = "application/json", ["Content-Type"] = "application/json;odata.metadata=minimal" };
+
+                        if (key != null)
+                        {
+                            Url += "/" + key;
+                        }
+
+                        break;
+                    }
+                default:
+                    {
+                        Headers = new();
+                        break;
+                    }
+            }
+        }
+
+        [JsonPropertyName("id")]
+        public Guid RequestId { get; }
+        [JsonPropertyName("url")]
+        public string Url { get; }
+        [JsonPropertyName("method")]
+        public string HttpMethod { get; }
+        [JsonPropertyName("body")]
+        public T Body { get; set; }
+        [JsonPropertyName("headers")]
+        public Dictionary<string, string>? Headers { get; }
+        [JsonIgnore]
+        public object Key { get; set; }
     }
 }
