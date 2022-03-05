@@ -13,6 +13,7 @@ namespace ClinicProject.Client.Services
             this.httpClientFactory = httpClientFactory;
             this.configuration = configuration;
             DiscoveryEndPoint = this.configuration.GetSection("OData").Value;
+            BatchingEndpoint = this.configuration.GetSection("ODataBatch").Value;
 
             HttpClient = this.httpClientFactory.CreateClient("NonTokenClient");
         }
@@ -20,6 +21,7 @@ namespace ClinicProject.Client.Services
         HttpClient HttpClient { get; set; }
 
         public string? DiscoveryEndPoint { get; }
+        public string? BatchingEndpoint { get; set; }
 
         public static APIDefinitionDocument APIDefinitionDocument { get; set; } = new();
 
@@ -34,7 +36,7 @@ namespace ClinicProject.Client.Services
 
             foreach (var property in APIDefinitionDocument.GetType().GetProperties())
             {
-                property.SetValue(APIDefinitionDocument, "/" + endpoints?.Where(e => e.ToLower() == property.Name.ToLower()).FirstOrDefault());
+                property.SetValue(APIDefinitionDocument, endpoints?.Where(e => e.ToLower() == property.Name.ToLower()).FirstOrDefault());
             }
         }
     }
