@@ -9,13 +9,13 @@
 
 	<ItemGroup>
 		<PackageReference Include="AutoMapper" Version="11.0.1" />
-		<PackageReference Include="AutoMapper.AspNetCore.OData.EFCore" Version="3.0.1" />
-		<PackageReference Include="AutoMapper.Extensions.ExpressionMapping" Version="5.0.0" />
+		<PackageReference Include="AutoMapper.AspNetCore.OData.EFCore" Version="3.0.2" />
+		<PackageReference Include="AutoMapper.Extensions.ExpressionMapping" Version="5.0.1" />
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
 		<PackageReference Include="JsonPatch.Net" Version="1.1.2" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="6.0.2" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.2" />
-		<PackageReference Include="Microsoft.AspNetCore.OData" Version="8.0.7" />
+		<PackageReference Include="Microsoft.AspNetCore.OData" Version="8.0.8" />
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.2" />
 		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.3" />
 	</ItemGroup>
