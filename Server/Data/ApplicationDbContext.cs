@@ -23,6 +23,42 @@ namespace ClinicProject.Server.Data
         {
             base.OnModelCreating(builder);
 
+            #region Patient
+
+            builder.Entity<Patient>().
+               HasMany(p => p.Appointments)
+               .WithOne().IsRequired()
+               .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Patient>().
+               HasMany(p => p.Treatments)
+               .WithOne().IsRequired()
+               .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Patient>().
+                 HasMany(p => p.Notes)
+                 .WithOne().IsRequired()
+                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<Patient>().
+             HasOne(p => p.ExtraData)
+             .WithOne()
+             .HasForeignKey<ExtraData>(e => e.PatientId)
+             .IsRequired()
+             .OnDelete(DeleteBehavior.Cascade);
+
+            #endregion
+
+            #region Treatments
+
+            builder.Entity<Treatment>()
+                .HasMany(t => t.Payments)
+                .WithOne()
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
+
+            #endregion
+
             builder.ApplyConfigurationsFromAssembly(System.Reflection.Assembly.GetExecutingAssembly());
         }
 
