@@ -1,10 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Options;
 using System.Text.Json;
 
 namespace ClinicProject.Server.Helpers
 {
     public class DTOModelBinder<T> : IModelBinder
     {
+        private readonly IOptions<JsonOptions> jsonOptions;
+
+        public DTOModelBinder(IOptions<JsonOptions> jsonOptions)
+        {
+            this.jsonOptions = jsonOptions;
+        }
         public async Task BindModelAsync(ModelBindingContext bindingContext)
         {
             if (bindingContext == null)
@@ -14,6 +22,8 @@ namespace ClinicProject.Server.Helpers
 
             try
             {
+                bindingContext.HttpContext.Request.EnableBuffering();
+
                 var bodyStream = bindingContext.HttpContext.Request.Body;
 
                 string bodyJson;
@@ -28,7 +38,7 @@ namespace ClinicProject.Server.Helpers
                     return;
                 }
 
-                var model = JsonSerializer.Deserialize<T>(bodyJson);
+                var model = JsonSerializer.Deserialize<T>(bodyJson, jsonOptions.Value.JsonSerializerOptions);
 
                 if (model == null)
                 {
