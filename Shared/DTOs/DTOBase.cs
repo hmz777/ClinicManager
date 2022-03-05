@@ -7,6 +7,12 @@ namespace ClinicProject.Shared.DTOs
 {
     public abstract class DTOBase
     {
+        public DTOBase()
+        {
+            CreationDate = DateTime.UtcNow;
+            UpdateDate = DateTime.UtcNow;
+        }
+
         [Display(Name = "Id")]
         [DataField(DataField.Empty, EditPreview = true)]
         public int Id { get; set; }
@@ -21,8 +27,10 @@ namespace ClinicProject.Shared.DTOs
         [JsonPropertyName("@odata.type")]
         public string ODataType { get; set; } = string.Empty;
 
+        [JsonIgnore]
         private IndexedProperty<string, object> _objValues;
 
+        [JsonIgnore]
         [NotMapped]
         public IndexedProperty<string, object> ObjectValues
         {
@@ -39,8 +47,10 @@ namespace ClinicProject.Shared.DTOs
             }
         }
 
+        [JsonIgnore]
         private IndexedProperty<string, string> _strValues;
 
+        [JsonIgnore]
         [NotMapped]
         public IndexedProperty<string, string> StringValues
         {
@@ -57,8 +67,10 @@ namespace ClinicProject.Shared.DTOs
             }
         }
 
+        [JsonIgnore]
         private IndexedProperty<string, int> _intValues;
 
+        [JsonIgnore]
         [NotMapped]
         public IndexedProperty<string, int> IntValues
         {
@@ -75,8 +87,10 @@ namespace ClinicProject.Shared.DTOs
             }
         }
 
+        [JsonIgnore]
         private IndexedProperty<string, DateTime?> _dateValues;
 
+        [JsonIgnore]
         [NotMapped]
         public IndexedProperty<string, DateTime?> DateValues
         {
