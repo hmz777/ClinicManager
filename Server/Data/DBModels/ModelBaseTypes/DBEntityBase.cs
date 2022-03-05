@@ -5,6 +5,12 @@ namespace ClinicProject.Server.Data.DBModels.ModelBaseTypes
 {
     public abstract class DBEntityBase
     {
+        public DBEntityBase()
+        {
+            CreationDate = DateTime.UtcNow;
+            UpdateDate = DateTime.UtcNow;
+        }
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
