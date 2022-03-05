@@ -25,7 +25,7 @@
         <MudItem xs="6">
             <MudPaper Class="d-flex" Elevation="0">
                 <MudDatePicker Class="mr-2" Variant="Variant.Outlined" Label="From Date" @bind-Date="DateFrom" DateFormat="dd/MM/yyyy" />
-                <MudDatePicker Variant="Variant.Outlined" Label="To Date" @bind-Date="DateFrom" DateFormat="dd/MM/yyyy" />
+                <MudDatePicker Variant="Variant.Outlined" Label="To Date" @bind-Date="DateTo" DateFormat="dd/MM/yyyy" />
             </MudPaper>
             <MudPaper Elevation="0" Class="mt-2">
                 <MudButton StartIcon="@Icons.Material.Outlined.DateRange" Variant="Variant.Filled" Color="Color.Primary">Filter by date</MudButton>
@@ -36,11 +36,18 @@
         </MudItem>
         <MudItem xs="12">
             <MudPaper Elevation="0">
-                <MudButton StartIcon="@Icons.Material.Outlined.Add" Variant="Variant.Filled" Color="Color.Primary" OnClick="OnAddPatient">Add Patient</MudButton>
-                <MudButton StartIcon="@Icons.Material.Outlined.Edit" Disabled="@(!CanEdit)" Variant="Variant.Filled" Color="Color.Warning">Edit Patient</MudButton>
-                <MudButton StartIcon="@Icons.Material.Outlined.Delete" Disabled="@(!CanDelete)" Variant="Variant.Filled" Color="Color.Error">Delete</MudButton>
-                <MudButton StartIcon="@Icons.Material.Outlined.SelectAll" Disabled="@(!CanSelectAll)" Variant="Variant.Filled" Color="Color.Secondary" OnClick="SelectAll">Select All</MudButton>
-                <MudButton StartIcon="@Icons.Material.Outlined.ClearAll" Disabled="@(!CanClearSelection)" Variant="Variant.Filled" Color="Color.Secondary" OnClick="ClearSelection">Clear Selection</MudButton>
+                <MudButtonGroup OverrideStyles="false" Class="mr-2">
+                    <MudButton StartIcon="@Icons.Material.Outlined.Add" Variant="Variant.Filled" Color="Color.Primary" OnClick="OnAddPatientBatchPart">Add Patient</MudButton>
+                    <MudButton StartIcon="@Icons.Material.Outlined.Delete" Disabled="@(!CanDelete)" Variant="Variant.Filled" Color="Color.Error" OnClick="OnDeleteBatchPart">Delete</MudButton>
+                </MudButtonGroup>
+                <MudButtonGroup OverrideStyles="false" Class="mr-2">
+                    <MudButton StartIcon="@Icons.Material.Outlined.SelectAll" Disabled="@(!CanSelectAll)" Variant="Variant.Filled" Color="Color.Secondary" OnClick="SelectAll">Select All</MudButton>
+                    <MudButton StartIcon="@Icons.Material.Outlined.ClearAll" Disabled="@(!CanClearSelection)" Variant="Variant.Filled" Color="Color.Secondary" OnClick="ClearSelection">Clear Selection</MudButton>
+                </MudButtonGroup>
+                <MudButtonGroup OverrideStyles="false">
+                    <MudButton StartIcon="@Icons.Material.Outlined.CheckCircleOutline" Disabled="@(!BatchModel.HasRequests())" Variant="Variant.Filled" Color="Color.Success" OnClick="SaveChanges">Apply</MudButton>
+                    <MudButton StartIcon="@Icons.Material.Outlined.Cancel" Disabled="@(!BatchModel.HasRequests())" Variant="Variant.Filled" Color="Color.Error" OnClick="ResetChanges">Cancel changes</MudButton>
+                </MudButtonGroup>
             </MudPaper>
         </MudItem>
     </MudGrid>
@@ -58,7 +65,7 @@
           FixedFooter="true"
           RowEditPreview="ItemBackup"
           RowEditCancel="OnItemEditCancel"
-          RowEditCommit="OnItemEditCommit"
+          RowEditCommit="OnBatchPart"
           IsEditRowSwitchingBlocked="true"
           SelectedItems="SelectedItems"
           SelectedItemsChanged="SelectedItemsChanged">
@@ -201,191 +208,3 @@
         <MudTablePager />
     </PagerContent>
 </MudTable>
-
-@code {
-    #region Services
-
-    [Inject] ODataCRUDHandler<T> ODataCRUDHandler { get; set; }
-
-    #endregion
-
-    #region Members
-
-    Dictionary<PropertyInfo, (DisplayAttribute, DataFieldAttribute)> PropertyAttributes = new();
-
-    MudTable<T>? Table;
-    IEnumerable<T> Items = new HashSet<T>();
-    HashSet<T> SelectedItems = new();
-
-    string? searchString;
-    T? EditBackupItem;
-
-    bool CanDelete = false;
-    bool CanEdit = false;
-    bool CanSelectAll = true;
-    bool CanClearSelection = false;
-
-    DateTime? DateFrom { get; set; }
-    DateTime? DateTo { get; set; }
-
-    #endregion
-
-    #region Life Cycle
-
-    protected override void OnInitialized()
-    {
-        foreach (var property in typeof(T).GetProperties())
-        {
-            var dataField = property.GetCustomAttributes(typeof(DataFieldAttribute), true).Cast<DataFieldAttribute>().FirstOrDefault();
-            var disp = property.GetCustomAttributes(typeof(DisplayAttribute), true).Cast<DisplayAttribute>().FirstOrDefault();
-
-            PropertyAttributes[property] = (disp, dataField);
-        }
-
-        PropertyAttributes = PropertyAttributes
-          .OrderByDescending(p => p.Key.Name.ToLower().StartsWith('i'))
-          .ThenByDescending(p => p.Value.Item2?.DataField != DataField.Navigation)
-          .ToDictionary(p => p.Key, p => p.Value);
-    }
-
-    #endregion
-
-    #region Selection Events
-
-    void SelectedItemsChanged(HashSet<T> selectedItems)
-    {
-        CanDelete = SelectedItems?.Count > 0;
-        CanEdit = SelectedItems?.Count == 1;
-        CanSelectAll = SelectedItems?.Count == 0;
-        CanClearSelection = SelectedItems?.Count > 0;
-    }
-
-    void SelectAll()
-    {
-        SelectedItems = Items.ToHashSet<T>();
-    }
-
-    void ClearSelection()
-    {
-        SelectedItems.Clear();
-    }
-
-    #endregion
-
-    #region A,D
-
-    async void OnAddPatient()
-    {
-        var AddDialog = DialogService.Show<AddPatientDialog>("Add Patient");
-        var dialogResult = await AddDialog.Result;
-
-        if (!dialogResult.Cancelled)
-        {
-            var Data = dialogResult.Data;
-
-            var res = await ODataCRUDHandler.Post(Data as T);
-
-            if (res.Key == System.Net.HttpStatusCode.Created)
-            {
-                Snackbar.Add("Patient added successfully.", Severity.Success);
-                await Table.ReloadServerData();
-            }
-            else
-            {
-                if (res.Value != null)
-                {
-                    Snackbar.Add(res.Value.ToString(), Severity.Error);
-                }
-                else
-                {
-                    Snackbar.Add("Patient could not be added.", Severity.Error);
-                }
-            }
-        }
-    }
-
-    #endregion
-
-    #region Inline Editing
-
-    void ItemBackup(object item)
-    {
-        EditBackupItem = Mapper.Map<T>(item);
-    }
-
-    void OnItemEditCancel(object item)
-    {
-        Mapper.Map(EditBackupItem, item);
-    }
-
-    async void OnItemEditCommit(object item)
-    {
-        var res = await ODataCRUDHandler.Put(item as T);
-
-        if (res.Key == System.Net.HttpStatusCode.NoContent)
-        {
-            Snackbar.Add("Item updated successfully.", Severity.Success);
-            return;
-        }
-        else if (res.Key == System.Net.HttpStatusCode.BadRequest)
-        {
-            if (res.Value != null)
-            {
-                Snackbar.Add(res.Value.ToString(), Severity.Error);
-
-                await InvokeAsync(() =>
-                {
-                    ModelRestoreHelper.Restore<T>(res.Value, EditBackupItem, item as T);
-                    StateHasChanged();
-                });
-            }
-            else
-            {
-                Snackbar.Add("Bad request.", Severity.Error);
-            }
-
-            return;
-        }
-        else
-        {
-            Snackbar.Add("Internal server error.", Severity.Error);
-        }
-    }
-
-    #endregion
-
-    #region Serverside Processing
-
-    async Task<TableData<T>> ServerReload(TableState tableState)
-    {
-        ClearSelection();
-
-        var crudModel = Mapper.Map<CRUDModel>(tableState);
-        crudModel.SearchString = searchString;
-
-        var res = await ODataCRUDHandler.Get(crudModel);
-        Items = res.Value;
-
-        return new TableData<T>() { TotalItems = res.Key, Items = res.Value };
-    }
-
-    async void OnSearch(string text)
-    {
-        searchString = text;
-        Table.NavigateTo(Page.First);
-        await Table.ReloadServerData();
-    }
-
-    #endregion
-
-    #region Value Changed Handlers
-
-    void OnEditValueChangedHandler(int Id, string name, object value)
-    {
-        var tableItem = Table.Items.Where(i => i.Id == Id).First();
-
-        tableItem.GetType().GetProperty(name).SetValue(tableItem, value);
-    }
-
-    #endregion
-        }
