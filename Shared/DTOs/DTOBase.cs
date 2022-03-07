@@ -16,16 +16,14 @@ namespace ClinicProject.Shared.DTOs
         [Display(Name = "Id")]
         [DataField(DataField.Empty, EditPreview = true)]
         public int Id { get; set; }
+
         [Display(Name = "Creation Date")]
         [DataField(DataField.DateTime, EditPreview = true)]
         public virtual DateTime CreationDate { get; set; }
+
         [Display(Name = "Update Date")]
         [DataField(DataField.DateTime, EditPreview = true)]
         public virtual DateTime UpdateDate { get; set; }
-
-        [NotMapped]
-        [JsonPropertyName("@odata.type")]
-        public string ODataType { get; set; } = string.Empty;
 
         [JsonIgnore]
         private IndexedProperty<string, object> _objValues;
@@ -38,7 +36,7 @@ namespace ClinicProject.Shared.DTOs
             {
                 if (_objValues == null)
                 {
-                    return new IndexedProperty<string, object>(
+                    _objValues = new IndexedProperty<string, object>(
                         (index) => { return this.GetType().GetProperty(index).GetValue(this); },
                         (index, value) => { this.GetType().GetProperty(index).SetValue(this, value); });
                 }
@@ -58,7 +56,7 @@ namespace ClinicProject.Shared.DTOs
             {
                 if (_strValues == null)
                 {
-                    return new IndexedProperty<string, string>(
+                    _strValues = new IndexedProperty<string, string>(
                         (index) => { return this.GetType().GetProperty(index).GetValue(this) as string; },
                         (index, value) => { this.GetType().GetProperty(index).SetValue(this, value); });
                 }
@@ -78,7 +76,7 @@ namespace ClinicProject.Shared.DTOs
             {
                 if (_intValues == null)
                 {
-                    return new IndexedProperty<string, int>(
+                    _intValues = new IndexedProperty<string, int>(
                         (index) => { return (int)this.GetType().GetProperty(index).GetValue(this); },
                         (index, value) => { this.GetType().GetProperty(index).SetValue(this, value); });
                 }
@@ -98,7 +96,7 @@ namespace ClinicProject.Shared.DTOs
             {
                 if (_dateValues == null)
                 {
-                    return new IndexedProperty<string, DateTime?>(
+                    _dateValues = new IndexedProperty<string, DateTime?>(
                         (index) => { return Convert.ToDateTime(this.GetType().GetProperty(index).GetValue(this)); },
                         (index, value) => { this.GetType().GetProperty(index).SetValue(this, value); });
                 }

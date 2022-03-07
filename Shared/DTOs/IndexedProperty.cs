@@ -10,6 +10,7 @@
             this.GetFunc = getFunc;
             this.SetAction = setAction;
         }
+
         public TValue this[TIndex i]
         {
             get
