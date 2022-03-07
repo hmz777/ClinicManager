@@ -53,8 +53,6 @@ namespace ClinicProject.Client.Services
 
             var data = mapper.Map<T>(Item);
 
-            data.ODataType = "ClinicProject.Shared.DTOs";
-
             var content = new StringContent(JsonSerializer.Serialize<T>(data), Encoding.UTF8, "application/json");
             content.Headers.Clear();
             content.Headers.Add("Content-Type", "application/json;odata.metadata=minimal");
@@ -114,13 +112,26 @@ namespace ClinicProject.Client.Services
             return await res.Content.ReadFromJsonAsync<ODataBatchResponseModel>();
         }
 
-        string ConstructQuery(CRUDModel crudModel)
+        static string ConstructQuery(CRUDModel crudModel)
         {
             var query = "?";
 
             if (!string.IsNullOrWhiteSpace(crudModel.SearchString))
             {
                 query += $"$search=\"{crudModel.SearchString}\"&";
+            }
+
+            if (crudModel.From != null && crudModel.To == null)
+            {
+                query += $"$filter=CreationDate gt {crudModel.From.Value:yyyy-MM-ddTHH:mm:ssZ}&";
+            }
+            else if (crudModel.From == null && crudModel.To != null)
+            {
+                query += $"$filter=CreationDate lt {crudModel.To.Value:yyyy-MM-ddTHH:mm:ssZ}&";
+            }
+            else if (crudModel.From != null && crudModel.To != null)
+            {
+                query += $"$filter=CreationDate gt {crudModel.From.Value:yyyy-MM-ddTHH:mm:ssZ} and CreationDate lt {crudModel.To.Value:yyyy-MM-ddTHH:mm:ssZ}&";
             }
 
             if (!string.IsNullOrWhiteSpace(crudModel.SortLabel))
