@@ -11,7 +11,7 @@
 
 
         public DataField DataField { get; }
-        public bool Editable { get; }
+        public bool Editable { get; set; }
         public bool EditPreview { get; set; }
     }
 }
