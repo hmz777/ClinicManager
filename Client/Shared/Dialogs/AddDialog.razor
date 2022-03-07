@@ -1,0 +1,54 @@
+﻿@using ClinicProject.Shared.Attributes
+@using ClinicProject.Shared.DTOs
+@using System.Linq.Expressions
+@using ClinicProject.Shared.Models.Patient
+@typeparam T where T : DTOBase
+
+<MudDialog>
+    <DialogContent>
+        <MudForm Model="Model" @ref="Form" Validation="@(ValidateValue)" ValidationDelay="0">
+            @foreach (var property in PropertyAttributes)
+            {
+                if (property.Value.Item2 != null)
+                {
+                    if (property.Value.Item2.Editable)
+                    {
+                        switch (property.Value.Item2.DataField)
+                        {
+                            case DataField.Text:
+                                <MudTextField T="string" For="@(Expression.Lambda<Func<string>>(Expression.Property(Expression.Constant(Model, typeof(T)), property.Key.Name)))" Immediate="true" Label="@(property.Value.Item1.Name)" @bind-Value="@(Model.StringValues[property.Key.Name])" />
+                                break;
+                            case DataField.MultiLineText:
+                                <MudTextField T="string" For="@(Expression.Lambda<Func<string>>(Expression.PropertyOrField(Expression.Constant(Model), property.Key.Name)))" Label="@(property.Value.Item1.Name)" Lines="5" @bind-Value="@(Model.StringValues[property.Key.Name])" />
+                                break;
+                            case DataField.Currency:
+                            case DataField.Number:
+                                <MudNumericField T="int" For="@(Expression.Lambda<Func<int>>(Expression.PropertyOrField(Expression.Constant(Model), property.Key.Name)))" Label="@(property.Value.Item1.Name)" @bind-Value="@(Model.IntValues[property.Key.Name])" />
+                                break;
+                            case DataField.PhoneNumber:
+                                <MudTextField T="string" For="@(Expression.Lambda<Func<string>>(Expression.PropertyOrField(Expression.Constant(Model), property.Key.Name)))" Label="@(property.Value.Item1.Name)" Mask="@(new PatternMask("000000000000000"))" @bind-Value="@(Model.StringValues[property.Key.Name])" />
+                                break;
+                            case DataField.DateTime:
+                                <MudDatePicker For="@(Expression.Lambda<Func<DateTime?>>(Expression.PropertyOrField(Expression.Constant(Model), property.Key.Name)))" Label="@(property.Value.Item1.Name)" DateFormat="dd/MM/yyyy" @bind-Date="@(Model.DateValues[property.Key.Name])" />
+                                break;
+                            @*case DataField.Enum:
+                                <MudSelect @bind-Value="@(Model.IntValues[property.Key.Name])">
+                                @foreach (var value in Enum.GetValues(property.Key.PropertyType))
+                                {
+                                <MudSelectItem Value="@value" />
+                                }
+                                </MudSelect>
+                                break;*@
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
