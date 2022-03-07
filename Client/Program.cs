@@ -1,9 +1,12 @@
 using ClinicProject.Client;
 using ClinicProject.Client.Services;
+using ClinicProject.Shared.Validators;
+using FluentValidation;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -19,7 +22,6 @@ builder.Services.AddHttpClient("ClinicProject.ServerAPI", client =>
 
 builder.Services.AddHttpClient("NonTokenClient", client => client.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress));
 
-// Supply HttpClient instances that include access tokens when making requests to the server project
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("ClinicProject.ServerAPI"));
 
 builder.Services.AddApiAuthorization();
@@ -33,7 +35,9 @@ builder.Services.Configure<JsonSerializerOptions>(options =>
     options.PropertyNameCaseInsensitive = true;
 });
 
-builder.Services.AddAutoMapper(System.Reflection.Assembly.GetExecutingAssembly());
+builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
+builder.Services.AddValidatorsFromAssembly(Assembly.GetAssembly(typeof(PatientValidator)));
 
 builder.Services.AddScoped(typeof(ODataCRUDHandler<>));
 

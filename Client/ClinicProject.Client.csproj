@@ -8,16 +8,18 @@
 
 	<ItemGroup>
 	  <None Include="Shared\Components\ODataCRUDBase.razor" />
+	  <None Include="Shared\Dialogs\AddDialog.razor" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="10.3.6" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.2" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.2" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="6.0.2" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
 		<PackageReference Include="MudBlazor" Version="6.0.7" />
-		<PackageReference Include="Radzen.Blazor" Version="3.16.1" />
+		<PackageReference Include="Radzen.Blazor" Version="3.16.2" />
 	</ItemGroup>
 
 	<ItemGroup>
