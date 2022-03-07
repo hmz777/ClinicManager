@@ -1,7 +1,6 @@
 ﻿@using ClinicProject.Client.Helpers
 @using ClinicProject.Client.Models.CRUD
 @using ClinicProject.Client.Services
-@using ClinicProject.Client.Shared.Patients
 @using ClinicProject.Shared.Attributes
 @using ClinicProject.Shared.DTOs
 @using System
@@ -28,7 +27,8 @@
                 <MudDatePicker Variant="Variant.Outlined" Label="To Date" @bind-Date="DateTo" DateFormat="dd/MM/yyyy" />
             </MudPaper>
             <MudPaper Elevation="0" Class="mt-2">
-                <MudButton StartIcon="@Icons.Material.Outlined.DateRange" Variant="Variant.Filled" Color="Color.Primary">Filter by date</MudButton>
+                <MudButton StartIcon="@Icons.Material.Outlined.DateRange" Variant="Variant.Filled" Color="Color.Primary" OnClick="FilterByDate">Filter by date</MudButton>
+                <MudButton StartIcon="@Icons.Material.Outlined.ClearAll" Variant="Variant.Filled" Color="Color.Error" OnClick="ClearDateFilter">Clear</MudButton>
             </MudPaper>
         </MudItem>
         <MudItem xs="12" Class="py-2">
@@ -175,10 +175,10 @@
                                 <MudSelect @bind-Value="@(context.ObjectValues[property.Key.Name])" Required>
                                     @foreach (var value in Enum.GetValues(property.Key.PropertyType))
                                     {
-                    <MudSelectItem Value="@value" />
+                                          <MudSelectItem Value="@value">@value.ToString()</MudSelectItem>
                                     }
-            </MudSelect>
-        </MudTd>
+                                </MudSelect>
+                            </MudTd>
                             break;
                         default:
                             break;

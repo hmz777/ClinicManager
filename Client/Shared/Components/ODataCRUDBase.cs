@@ -1,6 +1,6 @@
 ﻿using ClinicProject.Client.Models.CRUD;
 using ClinicProject.Client.Services;
-using ClinicProject.Client.Shared.Patients;
+using ClinicProject.Client.Shared.Dialogs;
 using ClinicProject.Shared.Attributes;
 using ClinicProject.Shared.DTOs;
 using ClinicProject.Shared.Models.Error;
@@ -36,8 +36,8 @@ namespace ClinicProject.Client.Shared.Components
         bool CanSelectAll = true;
         bool CanClearSelection = false;
 
-        DateTime DateFrom { get; set; }
-        DateTime DateTo { get; set; }
+        DateTime? DateFrom { get; set; }
+        DateTime? DateTo { get; set; }
 
         public ODataBatchRequestModel<T> BatchModel { get; set; } = new();
 
@@ -49,8 +49,17 @@ namespace ClinicProject.Client.Shared.Components
         {
             foreach (var property in typeof(T).GetProperties())
             {
-                var dataField = property.GetCustomAttributes(typeof(DataFieldAttribute), true).Cast<DataFieldAttribute>().FirstOrDefault();
-                var disp = property.GetCustomAttributes(typeof(DisplayAttribute), true).Cast<DisplayAttribute>().FirstOrDefault();
+                var attributes = property.GetCustomAttributes();
+
+                var dataField = attributes
+                    .Where(a => a.GetType() == typeof(DataFieldAttribute))
+                    .Cast<DataFieldAttribute>()
+                    .FirstOrDefault();
+
+                var disp = attributes
+                    .Where(a => a.GetType() == typeof(DisplayAttribute))
+                    .Cast<DisplayAttribute>()
+                    .FirstOrDefault();
 
                 PropertyAttributes[property] = (disp, dataField);
             }
@@ -118,8 +127,8 @@ namespace ClinicProject.Client.Shared.Components
 
         async void OnAddPatientBatchPart()
         {
-            var AddDialog = DialogService.Show<AddPatientDialog>("Add Patient");
-            var dialogResult = await AddDialog.Result;
+            var addDialog = DialogService.Show<AddDialog<T>>("Create new");
+            var dialogResult = await addDialog.Result;
 
             if (!dialogResult.Cancelled)
             {
@@ -211,6 +220,29 @@ namespace ClinicProject.Client.Shared.Components
             searchString = text;
             Table.NavigateTo(Page.First);
             await Table.ReloadServerData();
+        }
+
+        #endregion
+
+        #region Date Filter
+
+        async void FilterByDate()
+        {
+            if (DateFrom != null || DateTo != null)
+            {
+                await Table.ReloadServerData();
+            }
+        }
+
+        async void ClearDateFilter()
+        {
+            if (DateFrom != null || DateTo != null)
+            {
+                DateFrom = null;
+                DateTo = null;
+
+                await Table.ReloadServerData();
+            }
         }
 
         #endregion
