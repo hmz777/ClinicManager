@@ -16,29 +16,45 @@
                         switch (property.Value.Item2.DataField)
                         {
                             case DataField.Text:
-                                <MudTextField T="string" For="@(Expression.Lambda<Func<string>>(Expression.Property(Expression.Constant(Model, typeof(T)), property.Key.Name)))" Immediate="true" Label="@(property.Value.Item1.Name)" @bind-Value="@(Model.StringValues[property.Key.Name])" />
+                                var propObj = property.Key;
+                                <MudTextField For="@(Expression.Lambda<Func<string>>(
+                                Expression.Property(Expression.Property(Expression.Constant(this, this.GetType()), nameof(MudForm.Model)), property.Key.Name)))"
+                          Immediate="true" Label="@(property.Value.Item1.Name)" @bind-Value="@(Model.StringValues[property.Key.Name])" />
                                 break;
                             case DataField.MultiLineText:
-                                <MudTextField T="string" For="@(Expression.Lambda<Func<string>>(Expression.PropertyOrField(Expression.Constant(Model), property.Key.Name)))" Label="@(property.Value.Item1.Name)" Lines="5" @bind-Value="@(Model.StringValues[property.Key.Name])" />
+                                <MudTextField T="string" For="@(Expression.Lambda<Func<string>>(
+                                Expression.Property(Expression.Property(Expression.Constant(this, this.GetType()), nameof(MudForm.Model)), property.Key.Name)))"
+                          Label="@(property.Value.Item1.Name)" Lines="5" @bind-Value="@(Model.StringValues[property.Key.Name])" />
                                 break;
                             case DataField.Currency:
                             case DataField.Number:
-                                <MudNumericField T="int" For="@(Expression.Lambda<Func<int>>(Expression.PropertyOrField(Expression.Constant(Model), property.Key.Name)))" Label="@(property.Value.Item1.Name)" @bind-Value="@(Model.IntValues[property.Key.Name])" />
+                                <MudNumericField T="int" For="@(Expression.Lambda<Func<int>>(
+                                Expression.Property(Expression.Property(Expression.Constant(this, this.GetType()), nameof(MudForm.Model)), property.Key.Name)))"
+                             Label="@(property.Value.Item1.Name)" @bind-Value="@(Model.IntValues[property.Key.Name])" />
                                 break;
                             case DataField.PhoneNumber:
-                                <MudTextField T="string" For="@(Expression.Lambda<Func<string>>(Expression.PropertyOrField(Expression.Constant(Model), property.Key.Name)))" Label="@(property.Value.Item1.Name)" Mask="@(new PatternMask("000000000000000"))" @bind-Value="@(Model.StringValues[property.Key.Name])" />
+                                <MudTextField T="string" For="@(Expression.Lambda<Func<string>>(
+                                Expression.Property(Expression.Property(Expression.Constant(this, this.GetType()), nameof(MudForm.Model)), property.Key.Name)))"
+                          Label="@(property.Value.Item1.Name)" Mask="@(new PatternMask("000000000000000"))" @bind-Value="@(Model.StringValues[property.Key.Name])" />
                                 break;
                             case DataField.DateTime:
-                                <MudDatePicker For="@(Expression.Lambda<Func<DateTime?>>(Expression.PropertyOrField(Expression.Constant(Model), property.Key.Name)))" Label="@(property.Value.Item1.Name)" DateFormat="dd/MM/yyyy" @bind-Date="@(Model.DateValues[property.Key.Name])" />
+                                <MudDatePicker For="@(Expression.Lambda<Func<DateTime?>>(
+                                Expression.Property(Expression.Property(Expression.Constant(this, this.GetType()), nameof(MudForm.Model)), property.Key.Name)))"
+                           Label="@(property.Value.Item1.Name)" DateFormat="dd/MM/yyyy" @bind-Date="@(Model.DateValues[property.Key.Name])" />
                                 break;
-                            @*case DataField.Enum:
-                                <MudSelect @bind-Value="@(Model.IntValues[property.Key.Name])">
-                                @foreach (var value in Enum.GetValues(property.Key.PropertyType))
-                                {
-                                <MudSelectItem Value="@value" />
-                                }
+                            case DataField.Enum:
+                                <MudSelect T="string" For="@(Expression.Lambda<Func<string>>(
+                                Expression.Convert(
+                                Expression.Property(
+                                Expression.Property(
+                                Expression.Constant(this, this.GetType()), nameof(MudForm.Model)), property.Key.Name), typeof(string))))"
+                       Label="@(property.Value.Item1.Name)" @bind-Value="@(Model.StringValues[property.Key.Name])">
+                                    @foreach (var value in Enum.GetValues(property.Key.PropertyType))
+                                    {
+                                        <MudSelectItem Value="@(value)" />
+                                    }
                                 </MudSelect>
-                                break;*@
+                                break;
                             default:
                                 break;
                         }

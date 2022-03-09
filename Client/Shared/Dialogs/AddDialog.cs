@@ -16,9 +16,11 @@ namespace ClinicProject.Client.Shared.Dialogs
         MudForm Form;
         Dictionary<PropertyInfo, (DisplayAttribute, DataFieldAttribute)> PropertyAttributes = new();
 
+        public T Model { get; set; } = Activator.CreateInstance<T>();
+
         protected override void OnInitialized()
         {
-            foreach (var property in typeof(T).GetProperties())
+            foreach (var property in Model.GetType().GetProperties())
             {
                 var attributes = property.GetCustomAttributes();
 
@@ -40,8 +42,6 @@ namespace ClinicProject.Client.Shared.Dialogs
               .ThenByDescending(p => p.Value.Item2?.DataField != DataField.Navigation)
               .ToDictionary(p => p.Key, p => p.Value);
         }
-
-        public T Model { get; set; } = Activator.CreateInstance<T>();
 
         public Func<object, string, Task<IEnumerable<string>>> ValidateValue => async (model, propertyName) =>
         {
