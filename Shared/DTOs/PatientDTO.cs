@@ -6,6 +6,11 @@ namespace ClinicProject.Shared.DTOs
 {
     public class PatientDTO : DTOBase
     {
+        public PatientDTO()
+        {
+            Gender = Gender.Male;
+        }
+
         [Display(Name = "First Name")]
         [DataField(DataField.Text, Editable = true)]
         public string? FirstName { get; set; }
