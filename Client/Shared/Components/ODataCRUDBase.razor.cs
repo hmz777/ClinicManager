@@ -4,6 +4,7 @@ using ClinicProject.Shared.Attributes;
 using ClinicProject.Shared.DTOs;
 using ClinicProject.Shared.Models.Error;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Options;
 using MudBlazor;
 using System.Reflection;
 using System.Text.Json;
@@ -15,6 +16,7 @@ namespace ClinicProject.Client.Shared.Components
         #region Services
 
         [Inject] ODataCRUDHandler<T> ODataCRUDHandler { get; set; }
+        [Inject] IOptions<JsonSerializerOptions> JsonOptions { get; set; }
 
         #endregion
 
@@ -151,7 +153,7 @@ namespace ClinicProject.Client.Shared.Components
             StateHasChanged();
         }
 
-        void OnBatchPart(object item)
+        void OnPutBatchPart(object item)
         {
             T tItem = item as T;
 
@@ -219,6 +221,9 @@ namespace ClinicProject.Client.Shared.Components
 
         void OnSearch(object data, string fieldType)
         {
+            if (data == null || fieldType == null)
+                return;
+
             var property = typeof(T).GetProperties().Where(p => p.Name.ToLower() == fieldType.ToLower()).FirstOrDefault();
 
             if (property != null)
@@ -252,12 +257,12 @@ namespace ClinicProject.Client.Shared.Components
 
         #region Date Filter
 
-        async void ClearCreateDateRange()
+        void ClearCreateDateRange()
         {
             CreateDateRange = null;
         }
 
-        async void ClearUpdateDateRange()
+        void ClearUpdateDateRange()
         {
             UpdateDateRange = null;
         }
@@ -273,7 +278,7 @@ namespace ClinicProject.Client.Shared.Components
             var responses = BatchModel.Requests.Select(req => new { Id = req.RequestId, req.HttpMethod })
                 .Join(responseModel.Responses.Select(res => new { Id = res.ResponseId, res.Status, res.Body })
                 , req => req.Id, res => res.Id, (req, res) =>
-                new { req.HttpMethod, res.Status, Messages = res.Body?.Deserialize<ModelValidationResult>() });
+                new { req.HttpMethod, res.Status, Messages = res.Body?.Deserialize<ModelValidationResult>(JsonOptions.Value) });
 
             foreach (var response in responses)
             {
@@ -292,7 +297,17 @@ namespace ClinicProject.Client.Shared.Components
                         hasSuccessFlag = true;
                         break;
                     case System.Net.HttpStatusCode.BadRequest:
-                        Snackbar.Add($"{response.Messages}", Severity.Error);
+                        if ((bool)(response.Messages?.HasResults()))
+                        {
+                            foreach (var msg in response.Messages.Results)
+                            {
+                                Snackbar.Add($"{msg.Value}", Severity.Error);
+                            }
+                        }
+                        else
+                        {
+                            Snackbar.Add($"Bad request.", Severity.Error);
+                        }
                         break;
                     case System.Net.HttpStatusCode.InternalServerError:
                         Snackbar.Add($"Internal server error.", Severity.Error);
