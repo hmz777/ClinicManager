@@ -1,5 +1,4 @@
 ﻿using ClinicProject.Shared.Attributes;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
@@ -13,16 +12,13 @@ namespace ClinicProject.Shared.DTOs
             UpdateDate = DateTime.UtcNow;
         }
 
-        [Display(Name = "Id")]
-        [DataField(DataField.Empty, EditPreview = true)]
+        [DataField(DisplayName = "Id", DataField = DataField.Empty, EditPreview = true)]
         public int Id { get; set; }
 
-        [Display(Name = "Creation Date")]
-        [DataField(DataField.DateTime, EditPreview = true)]
+        [DataField(DisplayName = "Creation Date", DataField = DataField.DateTime, EditPreview = true)]
         public virtual DateTime CreationDate { get; set; }
 
-        [Display(Name = "Update Date")]
-        [DataField(DataField.DateTime, EditPreview = true)]
+        [DataField(DisplayName = "Update Date", DataField = DataField.DateTime, EditPreview = true)]
         public virtual DateTime UpdateDate { get; set; }
 
         [JsonIgnore]

@@ -1,6 +1,5 @@
 ﻿using ClinicProject.Shared.Attributes;
 using ClinicProject.Shared.Models.Patient;
-using System.ComponentModel.DataAnnotations;
 
 namespace ClinicProject.Shared.DTOs
 {
@@ -11,44 +10,34 @@ namespace ClinicProject.Shared.DTOs
             Gender = Gender.Male;
         }
 
-        [Display(Name = "First Name")]
-        [DataField(DataField.Text, Editable = true)]
+        [DataField(DisplayName = "First Name", DataField = DataField.Text, Editable = true, Searchable = true)]
         public string? FirstName { get; set; }
 
-        [Display(Name = "Middle Name")]
-        [DataField(DataField.Text, Editable = true)]
+        [DataField(DisplayName = "Middle Name", DataField = DataField.Text, Editable = true, Searchable = true)]
         public string? MiddleName { get; set; }
 
-        [Display(Name = "Last Name")]
-        [DataField(DataField.Text, Editable = true)]
+        [DataField(DisplayName = "Last Name", DataField = DataField.Text, Editable = true, Searchable = true)]
         public string? LastName { get; set; }
 
-        [Display(Name = "Age")]
-        [DataField(DataField.Number, Editable = true)]
+        [DataField(DisplayName = "Age", DataField = DataField.Number, Editable = true, Searchable = true)]
         public int Age { get; set; }
 
-        [Display(Name = "Gender")]
-        [DataField(DataField.Enum, Editable = true)]
+        [DataField(DisplayName = "Gender", DataField = DataField.Enum, Editable = true, Searchable = true)]
         public Gender Gender { get; set; }
 
-        [Display(Name = "Phone Number")]
-        [DataField(DataField.PhoneNumber, Editable = true)]
+        [DataField(DisplayName = "Phone Number", DataField = DataField.PhoneNumber, Editable = true, Searchable = true)]
         public string? PhoneNumber { get; set; }
 
-        [Display(Name = "Extra Data")]
-        [DataField(DataField.Navigation)]
+        [DataField(DisplayName = "Extra Data", DataField = DataField.Navigation)]
         public ExtraDataDTO? ExtraData { get; set; }
 
-        [Display(Name = "Appointments")]
-        [DataField(DataField.Navigation)]
+        [DataField(DisplayName = "Appointments", DataField = DataField.Navigation)]
         public List<AppointmentDTO>? Appointments { get; set; }
 
-        [Display(Name = "Treatments")]
-        [DataField(DataField.Navigation)]
+        [DataField(DisplayName = "Treatments", DataField = DataField.Navigation)]
         public List<TreatmentDTO>? Treatments { get; set; }
 
-        [Display(Name = "Notes")]
-        [DataField(DataField.Navigation)]
+        [DataField(DisplayName = "Notes", DataField = DataField.Navigation)]
         public List<NoteDTO>? Notes { get; set; }
     }
 }
