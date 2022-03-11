@@ -17,14 +17,15 @@
         </MudItem>
         <MudItem xs="6">
             <MudPaper Elevation="0">
-                <MudTextField Clearable="true" Label="Search Patients" T="string" ValueChanged="@(s=> OnSearch(s, "Search"))" Variant="Variant.Outlined" Adornment="Adornment.End"
+                <MudTextField Clearable="true" Label="Full Patient Search" T="string" ValueChanged="@(s=> OnSearch(s, "Search"))" Variant="Variant.Outlined" Adornment="Adornment.End"
                               AdornmentIcon="@Icons.Material.Outlined.Edit" AdornmentColor="Color.Primary" IconSize="Size.Medium"></MudTextField>
+                <MudDivider Class="my-2" />
                 @foreach (var item in PropertyAttributes.Where(i => i.Value?.DataField != DataField.Navigation && i.Value?.Searchable == true))
                 {
                     switch (item.Value.DataField)
                     {
                         case DataField.Text:
-                            <MudTextField Clearable="true" Label="@(item.Value.DisplayName)" T="string?" ValueChanged="@(s => OnSearch(s, item.Key.Name))" Variant="Variant.Outlined" Adornment="Adornment.End"
+                            <MudTextField Clearable="true" Label="@(item.Value.DisplayName)" T="string" ValueChanged="@(s => OnSearch(s, item.Key.Name))" Variant="Variant.Outlined" Adornment="Adornment.End"
                               AdornmentIcon="@Icons.Material.Outlined.Edit" AdornmentColor="Color.Primary" IconSize="Size.Medium"></MudTextField>
                             break;
                         case DataField.Number:
@@ -36,7 +37,7 @@
 
                             break;
                         case DataField.Enum:
-                            <MudSelect T="object" ValueChanged="@(s => OnSearch(s.ToString(), item.Key.Name))"
+                            <MudSelect T="object" ValueChanged="@(s => OnSearch(s?.ToString(), item.Key.Name))"
                            Clearable="true"
                            Label="@(item.Value.DisplayName)"
                            Adornment="Adornment.End"
@@ -107,7 +108,7 @@
           FixedFooter="true"
           RowEditPreview="ItemBackup"
           RowEditCancel="OnItemEditCancel"
-          RowEditCommit="OnBatchPart"
+          RowEditCommit="OnPutBatchPart"
           IsEditRowSwitchingBlocked="true"
           SelectedItems="SelectedItems"
           SelectedItemsChanged="SelectedItemsChanged">
