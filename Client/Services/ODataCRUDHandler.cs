@@ -140,31 +140,31 @@ namespace ClinicProject.Client.Services
 
                             if (tuple[1] is bool directionUp && directionUp == true)
                             {
-                                filter += $"{eqFilter.Key} gt {date.Value:yyyy-MM-ddTHH:mm:ssZ} and";
+                                filter += $"{eqFilter.Key} gt {date.Value:yyyy-MM-ddTHH:mm:ssZ} and ";
                             }
                             else
                             {
-                                filter += $"{eqFilter.Key} lt {date.Value:yyyy-MM-ddTHH:mm:ssZ} and";
+                                filter += $"{eqFilter.Key} lt {date.Value:yyyy-MM-ddTHH:mm:ssZ} and ";
                             }
                         }
                         else
                         {
-                            filter += $"{eqFilter.Key} eq {eqFilter.Value} and";
+                            filter += $"{eqFilter.Key} eq {eqFilter.Value} and ";
                         }
                     }
                 }
 
                 if (crudModel.CreatedFrom != null && crudModel.CreatedUntil == null)
                 {
-                    filter += $"CreationDate gt {crudModel.CreatedFrom.Value:yyyy-MM-ddTHH:mm:ssZ}";
+                    filter += $"CreationDate gt {crudModel.CreatedFrom.Value:yyyy-MM-ddTHH:mm:ssZ} and ";
                 }
                 else if (crudModel.CreatedFrom == null && crudModel.CreatedUntil != null)
                 {
-                    filter += $"CreationDate lt {crudModel.CreatedUntil.Value:yyyy-MM-ddTHH:mm:ssZ}";
+                    filter += $"CreationDate lt {crudModel.CreatedUntil.Value:yyyy-MM-ddTHH:mm:ssZ} and ";
                 }
                 else if (crudModel.CreatedFrom != null && crudModel.CreatedUntil != null)
                 {
-                    filter += $"CreationDate gt {crudModel.CreatedFrom.Value:yyyy-MM-ddTHH:mm:ssZ} and CreationDate lt {crudModel.CreatedUntil.Value:yyyy-MM-ddTHH:mm:ssZ}";
+                    filter += $"CreationDate gt {crudModel.CreatedFrom.Value:yyyy-MM-ddTHH:mm:ssZ} and CreationDate lt {crudModel.CreatedUntil.Value:yyyy-MM-ddTHH:mm:ssZ} and ";
                 }
 
                 if (crudModel.UpdatedFrom != null && crudModel.UpdatedUntil == null)
@@ -180,9 +180,9 @@ namespace ClinicProject.Client.Services
                     filter += $"UpdateDate gt {crudModel.UpdatedFrom.Value:yyyy-MM-ddTHH:mm:ssZ} and UpdateDate lt {crudModel.UpdatedUntil.Value:yyyy-MM-ddTHH:mm:ssZ}";
                 }
 
-                if (filter.EndsWith("and"))
+                if (filter.EndsWith("and "))
                 {
-                    filter = filter.Remove(filter.Length - 3);
+                    filter = filter.Remove(filter.Length - 4);
                 }
 
                 if (!filter.EndsWith('='))
