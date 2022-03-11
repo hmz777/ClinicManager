@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 
@@ -114,24 +115,81 @@ namespace ClinicProject.Client.Services
 
         static string ConstructQuery(CRUDModel crudModel)
         {
-            var query = "?";
+            string query = "?";
 
-            if (!string.IsNullOrWhiteSpace(crudModel.SearchString))
+            if (crudModel.HasSearch())
             {
                 query += $"$search=\"{crudModel.SearchString}\"&";
             }
 
-            if (crudModel.From != null && crudModel.To == null)
+            if (crudModel.HasFilter())
             {
-                query += $"$filter=CreationDate gt {crudModel.From.Value:yyyy-MM-ddTHH:mm:ssZ}&";
-            }
-            else if (crudModel.From == null && crudModel.To != null)
-            {
-                query += $"$filter=CreationDate lt {crudModel.To.Value:yyyy-MM-ddTHH:mm:ssZ}&";
-            }
-            else if (crudModel.From != null && crudModel.To != null)
-            {
-                query += $"$filter=CreationDate gt {crudModel.From.Value:yyyy-MM-ddTHH:mm:ssZ} and CreationDate lt {crudModel.To.Value:yyyy-MM-ddTHH:mm:ssZ}&";
+                string filter = "$filter=";
+
+                if (crudModel.EqFilters != null)
+                {
+                    foreach (var eqFilter in crudModel.EqFilters)
+                    {
+                        if (eqFilter.Value == null)
+                            continue;
+
+                        if (eqFilter.Value is ITuple tuple && tuple[1] != null)
+                        {
+                            //We have a date with direction
+                            var date = tuple[0] as DateTime?;
+
+                            if (tuple[1] is bool directionUp && directionUp == true)
+                            {
+                                filter += $"{eqFilter.Key} gt {date.Value:yyyy-MM-ddTHH:mm:ssZ} and";
+                            }
+                            else
+                            {
+                                filter += $"{eqFilter.Key} lt {date.Value:yyyy-MM-ddTHH:mm:ssZ} and";
+                            }
+                        }
+                        else
+                        {
+                            filter += $"{eqFilter.Key} eq {eqFilter.Value} and";
+                        }
+                    }
+                }
+
+                if (crudModel.CreatedFrom != null && crudModel.CreatedUntil == null)
+                {
+                    filter += $"CreationDate gt {crudModel.CreatedFrom.Value:yyyy-MM-ddTHH:mm:ssZ}";
+                }
+                else if (crudModel.CreatedFrom == null && crudModel.CreatedUntil != null)
+                {
+                    filter += $"CreationDate lt {crudModel.CreatedUntil.Value:yyyy-MM-ddTHH:mm:ssZ}";
+                }
+                else if (crudModel.CreatedFrom != null && crudModel.CreatedUntil != null)
+                {
+                    filter += $"CreationDate gt {crudModel.CreatedFrom.Value:yyyy-MM-ddTHH:mm:ssZ} and CreationDate lt {crudModel.CreatedUntil.Value:yyyy-MM-ddTHH:mm:ssZ}";
+                }
+
+                if (crudModel.UpdatedFrom != null && crudModel.UpdatedUntil == null)
+                {
+                    filter += $"UpdateDate gt {crudModel.UpdatedFrom.Value:yyyy-MM-ddTHH:mm:ssZ}";
+                }
+                else if (crudModel.UpdatedFrom == null && crudModel.UpdatedUntil != null)
+                {
+                    filter += $"UpdateDate lt {crudModel.UpdatedUntil.Value:yyyy-MM-ddTHH:mm:ssZ}";
+                }
+                else if (crudModel.UpdatedFrom != null && crudModel.UpdatedUntil != null)
+                {
+                    filter += $"UpdateDate gt {crudModel.UpdatedFrom.Value:yyyy-MM-ddTHH:mm:ssZ} and UpdateDate lt {crudModel.UpdatedUntil.Value:yyyy-MM-ddTHH:mm:ssZ}";
+                }
+
+                if (filter.EndsWith("and"))
+                {
+                    filter = filter.Remove(filter.Length - 3);
+                }
+
+                if (!filter.EndsWith('='))
+                {
+                    filter += "&";
+                    query += filter;
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(crudModel.SortLabel))
