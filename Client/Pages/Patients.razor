@@ -1,7 +1,17 @@
 ﻿@page "/patients"
+@using ClinicProject.Client.Shared.Dialogs.Patients
 @using ClinicProject.Shared.DTOs
 @inherits ODataCRUDBase<PatientDTO>
 
 @{
     base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        base.DialogType = typeof(AddPatient);
+    }
 }
