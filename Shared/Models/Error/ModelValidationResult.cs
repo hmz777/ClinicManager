@@ -4,7 +4,10 @@
     {
         public Dictionary<string, string> Results { get; set; }
 
-        public bool HasResults { get { return Results != null && Results.Count > 0; } }
+        public bool HasResults()
+        {
+            return Results != null && Results.Count > 0;
+        }
 
         public override string ToString()
         {
