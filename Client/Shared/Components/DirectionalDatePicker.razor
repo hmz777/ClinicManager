@@ -1,0 +1,30 @@
+﻿
+<MudPaper Elevation="0">
+    <MudDatePicker Variant="Variant.Outlined" AdornmentColor="Color.Primary" @bind-Date="DateInternal" Label="@Label" DateFormat="dd/MM/yyyy" />
+    <MudButton StartIcon="@Icons.Material.Outlined.Clear" Variant="Variant.Filled" Color="Color.Error" OnClick="ClearDate">Clear</MudButton>
+    <MudToggleIconButton Class="ms-auto"
+                         @bind-Toggled="@DirectionUpInternal"
+                         Icon="@Icons.Material.Filled.ArrowDownward" Color="@Color.Error" Title="Until Date"
+                         ToggledIcon="@Icons.Material.Filled.ArrowUpward" ToggledColor="@Color.Success" ToggledTitle="From Date" />
+    <span>@(DirectionUpInternal ? "From Date" : "Until Date")</span>
+</MudPaper>
+
+@code {
+    [Parameter] public string Label { get; set; }
+
+    [Parameter] public (DateTime?, bool) Date { get; set; }
+    [Parameter] public EventCallback<(DateTime?, bool)> DataChanged { get; set; }
+
+    DateTime? DateInternal { get; set; }
+    bool DirectionUpInternal { get; set; }
+
+    void ClearDate()
+    {
+        DateInternal = null;
+    }
+
+    async void DateChangedInternal()
+    {
+        await DataChanged.InvokeAsync((DateInternal, DirectionUpInternal));
+    }
+}
