@@ -4,6 +4,8 @@ using ClinicProject.Server.Data.DummyDataSeed;
 using ClinicProject.Server.Helpers;
 using ClinicProject.Server.OData;
 using ClinicProject.Server.Resources;
+using ClinicProject.Shared.Validators;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.OData;
@@ -12,6 +14,8 @@ using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+#region DBContext base configuration
 
 if (builder.Configuration.GetSection("ConnectionStrings:Active").Value == "Postgres")
 {
@@ -28,13 +32,21 @@ else
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
+#endregion
+
+#region ASP.NET Identity
+
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-      {
-          options.SignIn.RequireConfirmedAccount = true;
-          options.Password.RequiredLength = 8;
-      })
+{
+    options.SignIn.RequireConfirmedAccount = true;
+    options.Password.RequiredLength = 8;
+})
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
+
+#endregion
+
+#region Identity Server
 
 builder.Services.AddIdentityServer(options =>
 {
@@ -46,12 +58,20 @@ builder.Services.AddIdentityServer(options =>
 builder.Services.AddAuthentication()
     .AddIdentityServerJwt();
 
+#endregion
+
+#region Localization
+
 builder.Services.AddLocalization();
 
+#endregion
+
+#region MVC Config, OData
+
 builder.Services.AddControllersWithViews(options =>
-    {
-        options.ModelBinderProviders.Insert(0, new CustomModelBinderProvider());
-    })
+{
+    options.ModelBinderProviders.Insert(0, new CustomModelBinderProvider());
+})
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
@@ -78,13 +98,24 @@ builder.Services.AddControllersWithViews(options =>
     options.DataAnnotationLocalizerProvider = (type, factory) =>
         factory.Create(typeof(SharedResources));
 })
-.AddRazorRuntimeCompilation();
+.AddRazorRuntimeCompilation()
+.AddFluentValidation(options => options.RegisterValidatorsFromAssemblyContaining<PatientValidator>());
 
 builder.Services.AddRazorPages();
 
+#endregion
+
+#region Auto Mapper
+
 builder.Services.AddAutoMapper(System.Reflection.Assembly.GetExecutingAssembly());
 
+#endregion
+
+#region HTTPContext
+
 builder.Services.AddHttpContextAccessor();
+
+#endregion
 
 if (builder.Environment.IsDevelopment())
 {
