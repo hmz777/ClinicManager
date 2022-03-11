@@ -6,7 +6,7 @@ using MudBlazor;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
-namespace ClinicProject.Client.Shared.Dialogs
+namespace ClinicProject.Client.Shared.Dialogs.Base
 {
     public partial class AddDialog<T> where T : DTOBase
     {

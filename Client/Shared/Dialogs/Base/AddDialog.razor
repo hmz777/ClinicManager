@@ -39,21 +39,18 @@
                                 break;
                             case DataField.DateTime:
                                 <MudDatePicker For="@(Expression.Lambda<Func<DateTime?>>(
-                                Expression.Property(Expression.Property(Expression.Constant(this, this.GetType()), nameof(MudForm.Model)), property.Key.Name)))"
+                                Expression.Property(
+                                Expression.Property(
+                                Expression.Constant(this, this.GetType()), nameof(MudForm.Model)), property.Key.Name)))"
                            Label="@(property.Value.Item1.Name)" DateFormat="dd/MM/yyyy" @bind-Date="@(Model.DateValues[property.Key.Name])" />
                                 break;
                             case DataField.Enum:
-                                <MudSelect T="string" For="@(Expression.Lambda<Func<string>>(
-                                Expression.Convert(
-                                Expression.Property(
-                                Expression.Property(
-                                Expression.Constant(this, this.GetType()), nameof(MudForm.Model)), property.Key.Name), typeof(string))))"
-                       Label="@(property.Value.Item1.Name)" @bind-Value="@(Model.StringValues[property.Key.Name])">
+                                <MudSelect Label="@(property.Value.Item1.Name)" @bind-Value="@(Model.ObjectValues[property.Key.Name])">
                                     @foreach (var value in Enum.GetValues(property.Key.PropertyType))
                                     {
-                                        <MudSelectItem Value="@(value)" />
+                    <MudSelectItem Value="@(value)" />
                                     }
-                                </MudSelect>
+            </MudSelect>
                                 break;
                             default:
                                 break;
