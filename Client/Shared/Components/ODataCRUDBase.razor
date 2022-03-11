@@ -17,19 +17,61 @@
         </MudItem>
         <MudItem xs="6">
             <MudPaper Elevation="0">
-                <MudTextField Label="Search Patients" T="string" ValueChanged="@(s=> OnSearch(s))" Variant="Variant.Outlined" Adornment="Adornment.End"
-                              AdornmentIcon="@Icons.Material.Outlined.Search" AdornmentColor="Color.Primary" IconSize="Size.Medium"></MudTextField>
+                <MudTextField Clearable="true" Label="Search Patients" T="string" ValueChanged="@(s=> OnSearch(s, "Search"))" Variant="Variant.Outlined" Adornment="Adornment.End"
+                              AdornmentIcon="@Icons.Material.Outlined.Edit" AdornmentColor="Color.Primary" IconSize="Size.Medium"></MudTextField>
+                @foreach (var item in PropertyAttributes.Where(i => i.Value?.DataField != DataField.Navigation && i.Value?.Searchable == true))
+                {
+                    switch (item.Value.DataField)
+                    {
+                        case DataField.Text:
+                            <MudTextField Clearable="true" Label="@(item.Value.DisplayName)" T="string?" ValueChanged="@(s => OnSearch(s, item.Key.Name))" Variant="Variant.Outlined" Adornment="Adornment.End"
+                              AdornmentIcon="@Icons.Material.Outlined.Edit" AdornmentColor="Color.Primary" IconSize="Size.Medium"></MudTextField>
+                            break;
+                        case DataField.Number:
+                            <MudNumericField T="int?" Clearable="true" Label="@(item.Value.DisplayName)" ValueChanged="@(s => OnSearch(s, item.Key.Name))" Variant="Variant.Outlined" Adornment="Adornment.End"
+                                 AdornmentIcon="@Icons.Material.Outlined.Edit" AdornmentColor="Color.Primary" IconSize="Size.Medium"></MudNumericField>
+                            break;
+                        case DataField.DateTime:
+                            <DirectionalDatePicker Label="@(item.Value.DisplayName)" DataChanged="@(s => OnSearch(s, item.Key.Name))" />
+
+                            break;
+                        case DataField.Enum:
+                            <MudSelect T="object" ValueChanged="@(s => OnSearch(s.ToString(), item.Key.Name))"
+                           Clearable="true"
+                           Label="@(item.Value.DisplayName)"
+                           Adornment="Adornment.End"
+                           AdornmentIcon="@Icons.Material.Outlined.Edit"
+                           AdornmentColor="Color.Primary"
+                           Variant="Variant.Outlined"
+                           IconSize="Size.Medium">
+                                @foreach (var item in Enum.GetValues(item.Key.PropertyType))
+                                {
+                                    <MudSelectItem Value="@item" />
+                                }
+                            </MudSelect>
+                            break;
+                        default:
+                            break;
+                    }
+                }
             </MudPaper>
         </MudItem>
         <MudItem xs="6">
             <MudPaper Class="d-flex" Elevation="0">
-                <MudDatePicker Class="mr-2" Variant="Variant.Outlined" Label="From Date" @bind-Date="DateFrom" DateFormat="dd/MM/yyyy" />
-                <MudDatePicker Variant="Variant.Outlined" Label="To Date" @bind-Date="DateTo" DateFormat="dd/MM/yyyy" />
+                <MudDateRangePicker AdornmentColor="Color.Primary" Variant="Variant.Outlined" Label="Creation Date Range" @bind-DateRange="CreateDateRange" DateFormat="dd/MM/yyyy" />
             </MudPaper>
             <MudPaper Elevation="0" Class="mt-2">
-                <MudButton StartIcon="@Icons.Material.Outlined.DateRange" Variant="Variant.Filled" Color="Color.Primary" OnClick="FilterByDate">Filter by date</MudButton>
-                <MudButton StartIcon="@Icons.Material.Outlined.ClearAll" Variant="Variant.Filled" Color="Color.Error" OnClick="ClearDateFilter">Clear</MudButton>
+                <MudButton StartIcon="@Icons.Material.Outlined.Clear" Variant="Variant.Filled" Color="Color.Error" OnClick="ClearCreateDateRange">Clear</MudButton>
             </MudPaper>
+            <MudPaper Class="d-flex mt-2" Elevation="0">
+                <MudDateRangePicker AdornmentColor="Color.Primary" Variant="Variant.Outlined" Label="Update Date Range" @bind-DateRange="UpdateDateRange" DateFormat="dd/MM/yyyy" />
+            </MudPaper>
+            <MudPaper Elevation="0" Class="mt-2">
+                <MudButton StartIcon="@Icons.Material.Outlined.Clear" Variant="Variant.Filled" Color="Color.Error" OnClick="ClearUpdateDateRange">Clear</MudButton>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12">
+            <MudButton StartIcon="@Icons.Material.Outlined.Search" Variant="Variant.Filled" Color="Color.Success" OnClick="DoSearch">Search</MudButton>
         </MudItem>
         <MudItem xs="12" Class="py-2">
             <MudDivider />
@@ -89,15 +131,11 @@
     <HeaderContent>
         @foreach (var property in PropertyAttributes)
         {
-            if (property.Value.Item2 != null)
+            if (property.Value != null)
             {
-                if (property.Value.Item2.DataField != DataField.Navigation)
+                if (property.Value.DataField != DataField.Navigation)
                 {
-                    <MudTh><MudTableSortLabel T="T" SortLabel="@(property.Key.Name)">@property.Value.Item1.Name</MudTableSortLabel></MudTh>
-                }
-                else
-                {
-                    <MudTh>@property.Value.Item1.Name</MudTh>
+                    <MudTh><MudTableSortLabel T="T" SortLabel="@(property.Key.Name)">@property.Value.DisplayName</MudTableSortLabel></MudTh>
                 }
             }
         }
@@ -105,9 +143,9 @@
     <RowTemplate>
         @foreach (var property in PropertyAttributes)
         {
-            if (property.Value.Item2 != null)
+            if (property.Value != null)
             {
-                if (property.Value.Item2.DataField != DataField.Navigation)
+                if (property.Value.DataField != DataField.Navigation)
                 {
                     if (property.Key.PropertyType == typeof(DateTime))
                     {
@@ -118,33 +156,27 @@
                         <MudTd DataLabel="@(property.Key.Name)">@property.Key.GetValue(context)</MudTd>
                     }
                 }
-                else
-                {
-                    <MudTd DataLabel="@(property.Key.Name)">
-                        <MudButton Size="Size.Small" Variant="Variant.Outlined" Color="Color.Primary">View</MudButton>
-                    </MudTd>
-                }
             }
         }
     </RowTemplate>
     <RowEditingTemplate>
         @foreach (var property in PropertyAttributes)
         {
-            if (property.Value.Item2 != null)
+            if (property.Value != null)
             {
-                if (property.Value.Item2.Editable)
+                if (property.Value.Editable)
                 {
-                    switch (property.Value.Item2.DataField)
+                    switch (property.Value.DataField)
                     {
                         case DataField.Text:
                             <MudTd>
-                                <MudTextField Label="@(property.Value.Item1.Name)"
+                                <MudTextField Label="@(property.Value.DisplayName)"
                           @bind-Value="@(context.StringValues[property.Key.Name])" Required />
                             </MudTd>
                             break;
                         case DataField.MultiLineText:
                             <MudTd>
-                                <MudTextField Label="@(property.Value.Item1.Name)"
+                                <MudTextField Label="@(property.Value.DisplayName)"
                           Lines="3"
                           @bind-Value="@(context.StringValues[property.Key.Name])" Required />
                             </MudTd>
@@ -152,20 +184,20 @@
                         case DataField.Currency:
                         case DataField.Number:
                             <MudTd>
-                                <MudNumericField Label="@(property.Value.Item1.Name)"
+                                <MudNumericField Label="@(property.Value.DisplayName)"
                              @bind-Value="@(context.IntValues[property.Key.Name])" Required />
                             </MudTd>
                             break;
                         case DataField.PhoneNumber:
                             <MudTd>
-                                <MudTextField Label="@(property.Value.Item1.Name)"
+                                <MudTextField Label="@(property.Value.DisplayName)"
                           Mask="@(new PatternMask("000000000000000"))"
                           @bind-Value="@(context.StringValues[property.Key.Name])" Required />
                             </MudTd>
                             break;
                         case DataField.DateTime:
                             <MudTd>
-                                <MudDatePicker Label="@(property.Value.Item1.Name)"
+                                <MudDatePicker Label="@(property.Value.DisplayName)"
                            DateFormat="dd/MM/yyyy"
                            @bind-Date="@(context.DateValues[property.Key.Name])" Required />
                             </MudTd>
@@ -175,16 +207,16 @@
                                 <MudSelect @bind-Value="@(context.ObjectValues[property.Key.Name])" Required>
                                     @foreach (var value in Enum.GetValues(property.Key.PropertyType))
                                     {
-                                          <MudSelectItem Value="@value">@value.ToString()</MudSelectItem>
+                    <MudSelectItem Value="@value">@value.ToString()</MudSelectItem>
                                     }
-                                </MudSelect>
-                            </MudTd>
+            </MudSelect>
+        </MudTd>
                             break;
                         default:
                             break;
                     }
                 }
-                else if (property.Value.Item2.EditPreview)
+                else if (property.Value.EditPreview)
                 {
                     if (property.Key.PropertyType == typeof(DateTime))
                     {
