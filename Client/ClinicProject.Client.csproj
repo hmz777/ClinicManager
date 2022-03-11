@@ -8,7 +8,8 @@
 
 	<ItemGroup>
 	  <None Include="Shared\Components\ODataCRUDBase.razor" />
-	  <None Include="Shared\Dialogs\AddDialog.razor" />
+	  <None Include="Shared\Dialogs\Base\AddDialog.razor" />
+	  <None Include="Shared\Dialogs\Patients\AddPatient.razor" />
 	</ItemGroup>
 
 	<ItemGroup>
