@@ -1,4 +1,5 @@
-﻿@using MudBlazor.Utilities
+﻿@using Blazored.LocalStorage
+@using MudBlazor.Utilities
 @inherits LayoutComponentBase
 
 <AuthorizeView>
@@ -35,19 +36,28 @@
 </AuthorizeView>
 
 @code {
+    [Inject] ILocalStorageService LocalStorageService { get; set; }
+
     bool _drawerOpen = true;
     bool _isDarkMode = false;
     string _darkModeBtn = Icons.Material.Rounded.DarkMode;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isDarkMode = await LocalStorageService.GetItemAsync<bool>("DarkMode");
+    }
 
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
     }
 
-    void DarkModeToggle()
+    async void DarkModeToggle()
     {
         _isDarkMode = !_isDarkMode;
         _darkModeBtn = _darkModeBtn == Icons.Material.Rounded.DarkMode
         ? Icons.Material.Rounded.LightMode : Icons.Material.Rounded.DarkMode;
+
+        await LocalStorageService.SetItemAsync<bool>("DarkMode", _isDarkMode);
     }
 }
