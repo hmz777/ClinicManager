@@ -1,1 +1,18 @@
 ﻿@page "/appointments"
+@using ClinicProject.Client.Shared.Dialogs.Appointments
+@using ClinicProject.Client.Shared.Dialogs.Patients
+@using ClinicProject.Shared.DTOs
+@inherits ODataCRUDBase<AppointmentDTO>
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        base.DialogType = typeof(AddAppointment);
+    }
+}
