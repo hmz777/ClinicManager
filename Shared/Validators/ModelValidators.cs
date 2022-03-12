@@ -36,4 +36,17 @@ namespace ClinicProject.Shared.Validators
                .WithName("Phone Number");
         }
     }
+
+    public class AppointmentValidator : AbstractValidator<AppointmentDTO>
+    {
+        public AppointmentValidator()
+        {
+            RuleFor(appointment => appointment.AppointmentType)
+                .NotEmpty()
+                .IsInEnum();
+
+            RuleFor(appointment => appointment.Date)
+                .NotEmpty();
+        }
+    }
 }
