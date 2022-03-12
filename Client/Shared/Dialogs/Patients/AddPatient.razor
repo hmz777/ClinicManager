@@ -3,23 +3,33 @@
 <MudDialog>
     <DialogContent>
         <MudForm Model="Model" @ref="Form" Validation="@(ValidateValue)" ValidationDelay="0">
-            <MudTextField Label="First Name"
+            <MudTextField Class="mb-2"
+                          Variant="Variant.Outlined"
+                          Label="First Name"
                           Immediate="true"
                           For="() => Model.FirstName"
                           @bind-Value="Model.FirstName" />
-            <MudTextField Label="Middle Name"
+            <MudTextField Class="mb-2"
+                          Variant="Variant.Outlined"
+                          Label="Middle Name"
                           Immediate="true"
                           For="() => Model.MiddleName"
                           @bind-Value="Model.MiddleName" />
-            <MudTextField Label="Last Name"
+            <MudTextField Class="mb-2"
+                          Variant="Variant.Outlined"
+                          Label="Last Name"
                           Immediate="true"
                           For="() => Model.LastName"
                           @bind-Value="Model.LastName" />
-            <MudNumericField Label="Age"
+            <MudNumericField Class="mb-2"
+                             Variant="Variant.Outlined"
+                             Label="Age"
                              Immediate="true"
                              For="() => Model.Age"
                              @bind-Value="Model.Age" />
-            <MudSelect Label="Gender"
+            <MudSelect Class="mb-2"
+                       Variant="Variant.Outlined"
+                       Label="Gender"
                        Immediate="true"
                        For="() => Model.Gender"
                        @bind-Value="Model.Gender">
@@ -28,8 +38,10 @@
                     <MudSelectItem Value="@item" />
                 }
             </MudSelect>
-            <MudTextField Label="Phone Number"
+            <MudTextField Variant="Variant.Outlined"
+                          Label="Phone Number"
                           Immediate="true"
+                          Mask="@(new PatternMask("000000000000000"))"
                           For="() => Model.PhoneNumber"
                           @bind-Value="Model.PhoneNumber" />
         </MudForm>
