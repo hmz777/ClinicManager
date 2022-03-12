@@ -1,0 +1,26 @@
+﻿@using ClinicProject.Shared.DTOs
+@using ClinicProject.Shared.Models.Appointment
+@using ClinicProject.Shared.Models.Patient
+
+<MudDialog>
+    <DialogContent>
+        <MudForm Model="Model" @ref="Form" Validation="@(ValidateValue)" ValidationDelay="0">
+            <MudSelect Class="mb-2"
+            Variant="Variant.Outlined"
+                       Label="Appointment Type"
+                       Immediate="true"
+                       For="() => Model.AppointmentType"
+                       @bind-Value="Model.AppointmentType">
+                @foreach (var item in Enum.GetValues<AppointmentType>())
+                {
+                    <MudSelectItem Value="@item" />
+                }
+            </MudSelect>
+            <MudDatePicker Variant="Variant.Outlined" Label="Date" For="() => Model.Date" @bind-Date="Model.Date" DateFormat="dd/MM/yyyy - (hh:mm tt)" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
