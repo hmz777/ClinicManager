@@ -1,3 +1,4 @@
+using Blazored.LocalStorage;
 using ClinicProject.Client;
 using ClinicProject.Client.Services;
 using ClinicProject.Shared.Validators;
@@ -40,6 +41,11 @@ builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 builder.Services.AddValidatorsFromAssembly(Assembly.GetAssembly(typeof(PatientValidator)));
 
 builder.Services.AddScoped(typeof(ODataCRUDHandler<>));
+
+builder.Services.AddBlazoredLocalStorage(config =>
+{
+    config.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+});
 
 var app = builder.Build();
 
