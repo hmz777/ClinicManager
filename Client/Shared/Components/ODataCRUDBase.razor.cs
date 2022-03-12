@@ -284,16 +284,13 @@ namespace ClinicProject.Client.Shared.Components
             {
                 switch (response.Status)
                 {
+                    case System.Net.HttpStatusCode.NoContent:
                     case System.Net.HttpStatusCode.OK:
                         Snackbar.Add("Request completed successfully.", Severity.Success);
                         hasSuccessFlag = true;
                         break;
                     case System.Net.HttpStatusCode.Created:
                         Snackbar.Add("Resource created successfully.", Severity.Success);
-                        hasSuccessFlag = true;
-                        break;
-                    case System.Net.HttpStatusCode.NoContent:
-                        Snackbar.Add("Resource updated successfully.", Severity.Success);
                         hasSuccessFlag = true;
                         break;
                     case System.Net.HttpStatusCode.BadRequest:

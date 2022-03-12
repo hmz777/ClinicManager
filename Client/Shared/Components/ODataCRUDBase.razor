@@ -16,82 +16,69 @@
             <MudText Typo="Typo.h6">Filters</MudText>
         </MudItem>
         <MudItem xs="6">
-            <MudPaper Elevation="0">
-                <MudTextField Clearable="true" Label="Full Patient Search" T="string" ValueChanged="@(s=> OnSearch(s, "Search"))" Variant="Variant.Outlined" Adornment="Adornment.End"
-                              AdornmentIcon="@Icons.Material.Outlined.Edit" AdornmentColor="Color.Primary" IconSize="Size.Medium"></MudTextField>
-                <MudDivider Class="my-2" />
-                @foreach (var item in PropertyAttributes.Where(i => i.Value?.DataField != DataField.Navigation && i.Value?.Searchable == true))
+            <MudTextField Class="my-2" Clearable="true" Label="Full Patient Search" T="string" ValueChanged="@(s=> OnSearch(s, "Search"))" Variant="Variant.Outlined" Adornment="Adornment.End"
+                          AdornmentIcon="@Icons.Material.Outlined.Edit" AdornmentColor="Color.Primary" IconSize="Size.Medium"></MudTextField>
+            <MudDivider Class="my-2" />
+            @foreach (var item in PropertyAttributes.Where(i => i.Value?.DataField != DataField.Navigation && i.Value?.Searchable == true))
+            {
+                switch (item.Value.DataField)
                 {
-                    switch (item.Value.DataField)
-                    {
-                        case DataField.Text:
-                            <MudTextField Clearable="true" Label="@(item.Value.DisplayName)" T="string" ValueChanged="@(s => OnSearch(s, item.Key.Name))" Variant="Variant.Outlined" Adornment="Adornment.End"
-                              AdornmentIcon="@Icons.Material.Outlined.Edit" AdornmentColor="Color.Primary" IconSize="Size.Medium"></MudTextField>
-                            break;
-                        case DataField.Number:
-                            <MudNumericField T="int?" Clearable="true" Label="@(item.Value.DisplayName)" ValueChanged="@(s => OnSearch(s, item.Key.Name))" Variant="Variant.Outlined" Adornment="Adornment.End"
-                                 AdornmentIcon="@Icons.Material.Outlined.Edit" AdornmentColor="Color.Primary" IconSize="Size.Medium"></MudNumericField>
-                            break;
-                        case DataField.DateTime:
-                            <DirectionalDatePicker Label="@(item.Value.DisplayName)" DataChanged="@(s => OnSearch(s, item.Key.Name))" />
-
-                            break;
-                        case DataField.Enum:
-                            <MudSelect T="object" ValueChanged="@(s => OnSearch(s?.ToString(), item.Key.Name))"
-                           Clearable="true"
-                           Label="@(item.Value.DisplayName)"
-                           Adornment="Adornment.End"
-                           AdornmentIcon="@Icons.Material.Outlined.Edit"
-                           AdornmentColor="Color.Primary"
-                           Variant="Variant.Outlined"
-                           IconSize="Size.Medium">
-                                @foreach (var item in Enum.GetValues(item.Key.PropertyType))
-                                {
-                                    <MudSelectItem Value="@item" />
-                                }
-                            </MudSelect>
-                            break;
-                        default:
-                            break;
-                    }
+                    case DataField.Text:
+                        <MudTextField Class="my-2" Clearable="true" Label="@(item.Value.DisplayName)" T="string" ValueChanged="@(s => OnSearch(s, item.Key.Name))" Variant="Variant.Outlined" Adornment="Adornment.End"
+                          AdornmentIcon="@Icons.Material.Outlined.Edit" AdornmentColor="Color.Primary" IconSize="Size.Medium"></MudTextField>
+                        break;
+                    case DataField.Number:
+                        <MudNumericField Class="my-2" T="int?" Clearable="true" Label="@(item.Value.DisplayName)" ValueChanged="@(s => OnSearch(s, item.Key.Name))" Variant="Variant.Outlined" Adornment="Adornment.End"
+                             AdornmentIcon="@Icons.Material.Outlined.Edit" AdornmentColor="Color.Primary" IconSize="Size.Medium"></MudNumericField>
+                        break;
+                    case DataField.DateTime:
+                        <DirectionalDatePicker Class="my-2" Label="@(item.Value.DisplayName)" DataChanged="@(s => OnSearch(s, item.Key.Name))" />
+                        break;
+                    case DataField.Enum:
+                        <MudSelect T="object" ValueChanged="@(s => OnSearch(s?.ToString(), item.Key.Name))"
+                       Clearable="true"
+                       Label="@(item.Value.DisplayName)"
+                       Adornment="Adornment.End"
+                       AdornmentIcon="@Icons.Material.Outlined.Edit"
+                       AdornmentColor="Color.Primary"
+                       Variant="Variant.Outlined"
+                       IconSize="Size.Medium">
+                            @foreach (var item in Enum.GetValues(item.Key.PropertyType))
+                            {
+                                <MudSelectItem Value="@item" />
+                            }
+                        </MudSelect>
+                        break;
+                    default:
+                        break;
                 }
-            </MudPaper>
+            }
         </MudItem>
         <MudItem xs="6">
-            <MudPaper Class="d-flex" Elevation="0">
-                <MudDateRangePicker AdornmentColor="Color.Primary" Variant="Variant.Outlined" Label="Creation Date Range" @bind-DateRange="CreateDateRange" DateFormat="dd/MM/yyyy" />
-            </MudPaper>
-            <MudPaper Elevation="0" Class="mt-2">
-                <MudButton StartIcon="@Icons.Material.Outlined.Clear" Variant="Variant.Filled" Color="Color.Error" OnClick="ClearCreateDateRange">Clear</MudButton>
-            </MudPaper>
-            <MudPaper Class="d-flex mt-2" Elevation="0">
-                <MudDateRangePicker AdornmentColor="Color.Primary" Variant="Variant.Outlined" Label="Update Date Range" @bind-DateRange="UpdateDateRange" DateFormat="dd/MM/yyyy" />
-            </MudPaper>
-            <MudPaper Elevation="0" Class="mt-2">
-                <MudButton StartIcon="@Icons.Material.Outlined.Clear" Variant="Variant.Filled" Color="Color.Error" OnClick="ClearUpdateDateRange">Clear</MudButton>
-            </MudPaper>
+            <MudDateRangePicker AdornmentColor="Color.Primary" Variant="Variant.Outlined" Label="Creation Date Range" @bind-DateRange="CreateDateRange" DateFormat="dd/MM/yyyy" />
+            <MudButton Class="my-2" StartIcon="@Icons.Material.Outlined.Clear" Variant="Variant.Filled" Color="Color.Error" OnClick="ClearCreateDateRange">Clear</MudButton>
+            <MudDateRangePicker AdornmentColor="Color.Primary" Variant="Variant.Outlined" Label="Update Date Range" @bind-DateRange="UpdateDateRange" DateFormat="dd/MM/yyyy" />
+            <MudButton Class="mt-2" StartIcon="@Icons.Material.Outlined.Clear" Variant="Variant.Filled" Color="Color.Error" OnClick="ClearUpdateDateRange">Clear</MudButton>
         </MudItem>
         <MudItem xs="12">
             <MudButton StartIcon="@Icons.Material.Outlined.Search" Variant="Variant.Filled" Color="Color.Success" OnClick="DoSearch">Search</MudButton>
         </MudItem>
-        <MudItem xs="12" Class="py-2">
-            <MudDivider />
+        <MudItem xs="12">
+            <MudDivider Class="my-2" />
         </MudItem>
         <MudItem xs="12">
-            <MudPaper Elevation="0">
-                <MudButtonGroup OverrideStyles="false" Class="mr-2">
-                    <MudButton StartIcon="@Icons.Material.Outlined.Add" Variant="Variant.Filled" Color="Color.Primary" OnClick="OnAddPatientBatchPart">Add Patient</MudButton>
-                    <MudButton StartIcon="@Icons.Material.Outlined.Delete" Disabled="@(!CanDelete)" Variant="Variant.Filled" Color="Color.Error" OnClick="OnDeleteBatchPart">Delete</MudButton>
-                </MudButtonGroup>
-                <MudButtonGroup OverrideStyles="false" Class="mr-2">
-                    <MudButton StartIcon="@Icons.Material.Outlined.SelectAll" Disabled="@(!CanSelectAll)" Variant="Variant.Filled" Color="Color.Secondary" OnClick="SelectAll">Select All</MudButton>
-                    <MudButton StartIcon="@Icons.Material.Outlined.ClearAll" Disabled="@(!CanClearSelection)" Variant="Variant.Filled" Color="Color.Secondary" OnClick="ClearSelection">Clear Selection</MudButton>
-                </MudButtonGroup>
-                <MudButtonGroup OverrideStyles="false">
-                    <MudButton StartIcon="@Icons.Material.Outlined.CheckCircleOutline" Disabled="@(!BatchModel.HasRequests())" Variant="Variant.Filled" Color="Color.Success" OnClick="SaveChanges">Apply</MudButton>
-                    <MudButton StartIcon="@Icons.Material.Outlined.Cancel" Disabled="@(!BatchModel.HasRequests())" Variant="Variant.Filled" Color="Color.Error" OnClick="ResetChanges">Cancel changes</MudButton>
-                </MudButtonGroup>
-            </MudPaper>
+            <MudButtonGroup OverrideStyles="false" Class="mr-2">
+                <MudButton StartIcon="@Icons.Material.Outlined.Add" Variant="Variant.Filled" Color="Color.Primary" OnClick="OnAddPatientBatchPart">Add Patient</MudButton>
+                <MudButton StartIcon="@Icons.Material.Outlined.Delete" Disabled="@(!CanDelete)" Variant="Variant.Filled" Color="Color.Error" OnClick="OnDeleteBatchPart">Delete</MudButton>
+            </MudButtonGroup>
+            <MudButtonGroup OverrideStyles="false" Class="mr-2">
+                <MudButton StartIcon="@Icons.Material.Outlined.SelectAll" Disabled="@(!CanSelectAll)" Variant="Variant.Filled" Color="Color.Secondary" OnClick="SelectAll">Select All</MudButton>
+                <MudButton StartIcon="@Icons.Material.Outlined.ClearAll" Disabled="@(!CanClearSelection)" Variant="Variant.Filled" Color="Color.Secondary" OnClick="ClearSelection">Clear Selection</MudButton>
+            </MudButtonGroup>
+            <MudButtonGroup OverrideStyles="false">
+                <MudButton StartIcon="@Icons.Material.Outlined.CheckCircleOutline" Disabled="@(!BatchModel.HasRequests())" Variant="Variant.Filled" Color="Color.Success" OnClick="SaveChanges">Apply</MudButton>
+                <MudButton StartIcon="@Icons.Material.Outlined.Cancel" Disabled="@(!BatchModel.HasRequests())" Variant="Variant.Filled" Color="Color.Error" OnClick="ResetChanges">Cancel changes</MudButton>
+            </MudButtonGroup>
         </MudItem>
     </MudGrid>
 </MudPaper>
@@ -115,20 +102,6 @@
     <ToolBarContent>
         <MudText Typo="Typo.h6">Patients</MudText>
     </ToolBarContent>
-    <ColGroup>
-        <col />
-        <col />
-        <col style="width:15%;" />
-        <col style="width:20%;" />
-        <col style="width:15%;" />
-        <col />
-        <col />
-        <col style="width:15%;" />
-        <col />
-        <col />
-        <col />
-        <col />
-    </ColGroup>
     <HeaderContent>
         @foreach (var property in PropertyAttributes)
         {
@@ -150,7 +123,7 @@
                 {
                     if (property.Key.PropertyType == typeof(DateTime))
                     {
-                        <MudTd DataLabel="@(property.Key.Name)">@context.DateValues[property.Key.Name]?.ToString("dd/MM/yyyy")</MudTd>
+                        <MudTd DataLabel="@(property.Key.Name)">@context.DateValues[property.Key.Name]?.ToString("dd/MM/yyyy - (hh:mm tt)")</MudTd>
                     }
                     else
                     {

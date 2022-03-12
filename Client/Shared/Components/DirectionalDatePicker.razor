@@ -1,8 +1,8 @@
 ﻿
-<MudPaper Elevation="0">
+<MudPaper Class="@Class" Elevation="0">
     <MudDatePicker Variant="Variant.Outlined" AdornmentColor="Color.Primary" @bind-Date="DateInternal" Label="@Label" DateFormat="dd/MM/yyyy" />
-    <MudButton StartIcon="@Icons.Material.Outlined.Clear" Variant="Variant.Filled" Color="Color.Error" OnClick="ClearDate">Clear</MudButton>
-    <MudToggleIconButton Class="ms-auto"
+    <MudButton Class="mt-1" StartIcon="@Icons.Material.Outlined.Clear" Variant="Variant.Filled" Color="Color.Error" OnClick="ClearDate">Clear</MudButton>
+    <MudToggleIconButton Class="mt-1 ms-auto"
                          @bind-Toggled="@DirectionUpInternal"
                          Icon="@Icons.Material.Filled.ArrowDownward" Color="@Color.Error" Title="Until Date"
                          ToggledIcon="@Icons.Material.Filled.ArrowUpward" ToggledColor="@Color.Success" ToggledTitle="From Date" />
@@ -11,6 +11,7 @@
 
 @code {
     [Parameter] public string Label { get; set; }
+    [Parameter] public string Class { get; set; }
 
     [Parameter] public (DateTime?, bool) Date { get; set; }
     [Parameter] public EventCallback<(DateTime?, bool)> DataChanged { get; set; }
