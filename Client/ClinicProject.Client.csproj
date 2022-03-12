@@ -8,12 +8,14 @@
 
 	<ItemGroup>
 	  <None Include="Shared\Components\ODataCRUDBase.razor" />
+	  <None Include="Shared\Dialogs\Appointments\AddAppointment.razor" />
 	  <None Include="Shared\Dialogs\Base\AddDialog.razor" />
 	  <None Include="Shared\Dialogs\Patients\AddPatient.razor" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+		<PackageReference Include="Blazored.LocalStorage" Version="4.2.0" />
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="10.4.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.3" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.3" PrivateAssets="all" />
