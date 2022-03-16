@@ -1,4 +1,5 @@
-﻿using ClinicProject.Client.Models.CRUD;
+﻿using ClinicProject.Client.Helpers;
+using ClinicProject.Client.Models.CRUD;
 using ClinicProject.Client.Services;
 using ClinicProject.Shared.Attributes;
 using ClinicProject.Shared.DTOs;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Options;
 using MudBlazor;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 namespace ClinicProject.Client.Shared.Components
@@ -36,7 +38,7 @@ namespace ClinicProject.Client.Shared.Components
         bool CanClearSelection = false;
 
         string? SearchString { get; set; }
-        Dictionary<string, object> EqFilters { get; set; } = new();
+        Dictionary<string, Tuple<object, ODataFilterOp>> EqFilters { get; set; } = new();
         DateRange? CreateDateRange { get; set; }
         DateRange? UpdateDateRange { get; set; }
 
@@ -105,7 +107,7 @@ namespace ClinicProject.Client.Shared.Components
             StateHasChanged();
         }
 
-        async void SaveChanges()
+        async Task SaveChanges()
         {
             var response = await ODataCRUDHandler.Batch(BatchModel);
 
@@ -123,7 +125,7 @@ namespace ClinicProject.Client.Shared.Components
 
         #region Batch CRUD
 
-        async void OnAddPatientBatchPart()
+        async Task OnAddPatientBatchPart()
         {
             var addDialog = DialogService.Show(DialogType, "Create new");
             var dialogResult = await addDialog.Result;
@@ -238,8 +240,13 @@ namespace ClinicProject.Client.Shared.Components
 
                     data = $"'{s}'";
                 }
+                else if (data is ITuple tuple && tuple.HasNull())
+                {
+                    EqFilters.Remove(property.Name);
+                    return;
+                }
 
-                EqFilters[property.Name] = data;
+                EqFilters[property.Name] = new Tuple<object, ODataFilterOp>(data, ODataFilterOp.Equal);
             }
             else if (fieldType == "Search")
             {
@@ -247,7 +254,7 @@ namespace ClinicProject.Client.Shared.Components
             }
         }
 
-        async void DoSearch()
+        async Task DoSearch()
         {
             Table.NavigateTo(Page.First);
             await Table.ReloadServerData();
