@@ -1,31 +1,42 @@
-﻿
-<MudPaper Class="@Class" Elevation="0">
+﻿<MudPaper Class="@Class" Elevation="0">
     <MudDatePicker Variant="Variant.Outlined" AdornmentColor="Color.Primary" @bind-Date="DateInternal" Label="@Label" DateFormat="dd/MM/yyyy" />
-    <MudButton Class="mt-1" StartIcon="@Icons.Material.Outlined.Clear" Variant="Variant.Filled" Color="Color.Error" OnClick="ClearDate">Clear</MudButton>
-    <MudToggleIconButton Class="mt-1 ms-auto"
-                         @bind-Toggled="@DirectionUpInternal"
-                         Icon="@Icons.Material.Filled.ArrowDownward" Color="@Color.Error" Title="Until Date"
-                         ToggledIcon="@Icons.Material.Filled.ArrowUpward" ToggledColor="@Color.Success" ToggledTitle="From Date" />
-    <span>@(DirectionUpInternal ? "From Date" : "Until Date")</span>
+    <MudPaper Elevation="0" Class="d-flex justify-space-between align-center mt-1">
+        <MudButton StartIcon="@Icons.Material.Outlined.Clear" Variant="Variant.Filled" Color="Color.Error" OnClick="ClearDate">Clear</MudButton>
+        <MudPaper Elevation="0">
+            <MudToggleIconButton @bind-Toggled="DirectionUpInternal"
+                                 Icon="@Icons.Material.Filled.ArrowDownward" Color="@Color.Error" Title="Until Date"
+                                 ToggledIcon="@Icons.Material.Filled.ArrowUpward" ToggledColor="@Color.Success" ToggledTitle="From Date" />
+            <span>@(DirectionUpInternal ? "From Date" : "Until Date")</span>
+            <MudButton Class="ms-3" OnClick="UpdateData" Variant="Variant.Filled" Color="Color.Primary">Update</MudButton>
+        </MudPaper>
+    </MudPaper>
 </MudPaper>
 
 @code {
     [Parameter] public string Label { get; set; }
     [Parameter] public string Class { get; set; }
 
-    [Parameter] public (DateTime?, bool) Date { get; set; }
+    [Parameter] public (DateTime?, bool) Data { get; set; }
     [Parameter] public EventCallback<(DateTime?, bool)> DataChanged { get; set; }
 
     DateTime? DateInternal { get; set; }
     bool DirectionUpInternal { get; set; }
 
-    void ClearDate()
+    async Task ClearDate()
     {
         DateInternal = null;
+        await UpdateData();
     }
 
-    async void DateChangedInternal()
+    async Task UpdateData()
     {
-        await DataChanged.InvokeAsync((DateInternal, DirectionUpInternal));
+        if (DateInternal == null)
+        {
+            await DataChanged.InvokeAsync(default);
+        }
+        else
+        {
+            await DataChanged.InvokeAsync((DateInternal, DirectionUpInternal));
+        }
     }
 }
