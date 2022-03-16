@@ -6,6 +6,8 @@ using ClinicProject.Server.Data.DBModels.PatientTypes;
 using ClinicProject.Server.Data.DBModels.PaymentTypes;
 using ClinicProject.Server.Data.DBModels.TreatmentTypes;
 using ClinicProject.Shared.DTOs;
+using ClinicProject.Shared.DTOs.Appointments;
+using ClinicProject.Shared.DTOs.Patients;
 
 namespace ClinicProject.Server.Helpers
 {
@@ -43,7 +45,8 @@ namespace ClinicProject.Server.Helpers
             public AppointmentProfile()
             {
                 CreateMap<Appointment, AppointmentDTO>()
-                    .IncludeBase<DBEntityBase, DTOBase>();
+                    .IncludeBase<DBEntityBase, DTOBase>()
+                    .ReverseMap();
             }
         }
 
