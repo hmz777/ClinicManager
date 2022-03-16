@@ -94,7 +94,7 @@ namespace ClinicProject.Shared.DTOs
                 {
                     _dateValues = new IndexedProperty<string, DateTime?>(
                         (index) => { return Convert.ToDateTime(this.GetType().GetProperty(index).GetValue(this)); },
-                        (index, value) => { this.GetType().GetProperty(index).SetValue(this, value); });
+                        (index, value) => { this.GetType().GetProperty(index).SetValue(this, (DateTime)value); });
                 }
 
                 return _dateValues;
