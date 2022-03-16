@@ -133,7 +133,7 @@ namespace ClinicProject.Client.Services
                         if (eqFilter.Value == null)
                             continue;
 
-                        if (eqFilter.Value is ITuple tuple && tuple[1] != null)
+                        if (eqFilter.Value.Item1 is ITuple tuple && tuple[0] != null)
                         {
                             //We have a date with direction
                             var date = tuple[0] as DateTime?;
@@ -149,7 +149,17 @@ namespace ClinicProject.Client.Services
                         }
                         else
                         {
-                            filter += $"{eqFilter.Key} eq {eqFilter.Value} and ";
+                            switch (eqFilter.Value.Item2)
+                            {
+                                case ODataFilterOp.Equal:
+                                    filter += $"{eqFilter.Key} eq {eqFilter.Value.Item1} and ";
+                                    break;
+                                case ODataFilterOp.Contains:
+                                    filter += $"contains({eqFilter.Key}, {eqFilter.Value.Item1}) and ";
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
                     }
                 }
@@ -201,7 +211,28 @@ namespace ClinicProject.Client.Services
                 query += $"$orderby=Id asc&";
             }
 
-            query += $"$top={crudModel.PageSize}&$skip={crudModel.Page * crudModel.PageSize}&$count=true";
+            if (crudModel.PageSize > 0)
+            {
+                query += $"$top={crudModel.PageSize}&";
+
+                if (crudModel.Page >= 0)
+                {
+                    query += $"$skip={crudModel.Page * crudModel.PageSize}&";
+                }
+            }
+
+            if (crudModel.HasSelect())
+            {
+                var select = "$select=" + string.Join(',', crudModel.SelectedProperties);
+
+                if (!select.EndsWith('='))
+                {
+                    select += "&";
+                    query += select;
+                }
+            }
+
+            query += $"$count=true";
 
             return query;
         }
