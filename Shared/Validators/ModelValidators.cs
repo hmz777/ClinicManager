@@ -1,4 +1,5 @@
-﻿using ClinicProject.Shared.DTOs;
+﻿using ClinicProject.Shared.DTOs.Appointments;
+using ClinicProject.Shared.DTOs.Patients;
 using FluentValidation;
 
 namespace ClinicProject.Shared.Validators

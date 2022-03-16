@@ -3,7 +3,7 @@ using AutoMapper;
 using AutoMapper.AspNet.OData;
 using ClinicProject.Server.Data;
 using ClinicProject.Server.Data.DBModels.PatientTypes;
-using ClinicProject.Shared.DTOs;
+using ClinicProject.Shared.DTOs.Patients;
 using ClinicProject.Shared.Models.Error;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
@@ -27,7 +27,6 @@ namespace ClinicProject.Server.Controllers
         public async Task<IActionResult> Get(ODataQueryOptions<PatientDTO> options)
         {
             var query = await _context.Patients.GetQueryAsync<PatientDTO, Patient>(mapper, options);
-
             return Ok(await query.ToListAsync());
         }
 
@@ -35,7 +34,6 @@ namespace ClinicProject.Server.Controllers
         public async Task<IActionResult> Get(int key, ODataQueryOptions<PatientDTO> options)
         {
             var result = await _context.Patients.Where(p => p.Id == key).GetQueryAsync(mapper, options);
-
             return Ok(await result.FirstOrDefaultAsync());
         }
 

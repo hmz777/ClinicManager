@@ -4,6 +4,8 @@ using ClinicProject.Server.Data.DBModels.PatientTypes;
 using ClinicProject.Server.Data.DBModels.PaymentTypes;
 using ClinicProject.Server.Data.DBModels.TreatmentTypes;
 using ClinicProject.Shared.DTOs;
+using ClinicProject.Shared.DTOs.Appointments;
+using ClinicProject.Shared.DTOs.Patients;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 

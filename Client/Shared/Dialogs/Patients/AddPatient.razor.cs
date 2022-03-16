@@ -1,4 +1,4 @@
-﻿using ClinicProject.Shared.DTOs;
+﻿using ClinicProject.Shared.DTOs.Patients;
 using FluentValidation;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;

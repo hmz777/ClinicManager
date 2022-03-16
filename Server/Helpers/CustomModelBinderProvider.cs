@@ -1,4 +1,4 @@
-﻿using ClinicProject.Shared.DTOs;
+﻿using ClinicProject.Shared.DTOs.Patients;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 
