@@ -1,7 +1,8 @@
 ﻿using ClinicProject.Shared.Attributes;
+using ClinicProject.Shared.DTOs.Patients;
 using ClinicProject.Shared.Models.Appointment;
 
-namespace ClinicProject.Shared.DTOs
+namespace ClinicProject.Shared.DTOs.Appointments
 {
     public class AppointmentDTO : DTOBase
     {
@@ -15,7 +16,7 @@ namespace ClinicProject.Shared.DTOs
         public virtual AppointmentType AppointmentType { get; set; }
 
         [DataField(DisplayName = "Date", DataField = DataField.DateTime, Editable = true, Searchable = true)]
-        public virtual DateTime? Date { get; set; }
+        public virtual DateTime Date { get; set; }
 
         [DataField(DisplayName = "Patient", DataField = DataField.Navigation)]
         public PatientDTO? PatientDTO { get; set; }

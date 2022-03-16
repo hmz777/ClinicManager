@@ -1,7 +1,8 @@
 ﻿using ClinicProject.Shared.Attributes;
+using ClinicProject.Shared.DTOs.Appointments;
 using ClinicProject.Shared.Models.Patient;
 
-namespace ClinicProject.Shared.DTOs
+namespace ClinicProject.Shared.DTOs.Patients
 {
     public class PatientDTO : DTOBase
     {
