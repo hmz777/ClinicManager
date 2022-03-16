@@ -1,0 +1,89 @@
+﻿@using ClinicProject.Client.Models.CRUD
+@using ClinicProject.Client.Models.Patients
+@using ClinicProject.Client.Services
+@using ClinicProject.Shared.DTOs.Patients
+
+<MudPaper Class="@("d-flex flex-column border-solid border-2 mud-border-default pa-4 " + Class)" Elevation="0">
+    <div class="d-flex align-center">
+        <MudTextField @ref="SearchField" Class="mb-2" DebounceInterval="1000" Clearable="true" Label="Patient Search" T="string" ValueChanged="@(s => DoSearch(s))" Variant="Variant.Outlined" Adornment="Adornment.End"
+                      AdornmentIcon="@Icons.Material.Outlined.Search" AdornmentColor="Color.Primary" IconSize="Size.Medium"></MudTextField>
+        <MudProgressCircular Class="@($"ms-2 {(isLoading ? "" : "d-none")}")" Color="Color.Primary" Indeterminate="true" />
+    </div>
+    @if (isVisible)
+    {
+        <MudSelect Label="Select a patient" Variant="Variant.Outlined" T="PatientSelectModel" ValueChanged="(p) => OnItemSelected(p)">
+            @foreach (var patient in Patients)
+            {
+                <MudSelectItem @key="patient" Value="@patient">
+                    <MudText>@patient.FullName</MudText>
+                </MudSelectItem>
+            }
+        </MudSelect>
+    }
+</MudPaper>
+
+@code {
+    [Inject] ODataCRUDHandler<PatientDTO> ODataCRUDHandler { get; set; }
+
+    [Parameter] public int SelectedPatient { get; set; }
+    [Parameter] public EventCallback<int> SelectedPatientChanged { get; set; }
+    [Parameter] public string Class { get; set; }
+
+    MudTextField<string> SearchField;
+
+    List<PatientSelectModel> Patients;
+    bool isVisible;
+    bool isLoading;
+
+    public CRUDModel CRUDModel { get; set; }
+    public string Prop1 { get; set; } = "FirstName";
+    public string Prop2 { get; set; } = "LastName";
+
+    protected override void OnInitialized()
+    {
+        CRUDModel = new()
+            {
+                PageSize = -1,
+                Page = -1,
+                SelectedProperties = new List<string> { "Id", Prop1, Prop2 },
+                EqFilters = new Dictionary<string, Tuple<object, ODataFilterOp>>()
+            };
+    }
+
+    async Task DoSearch(string searchTerm)
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+        {
+            isVisible = false;
+            return;
+        }
+
+        isLoading = true;
+
+        CRUDModel.EqFilters.Clear();
+        CRUDModel.EqFilters.Add(Prop1, new Tuple<object, ODataFilterOp>($"'{searchTerm}'", ODataFilterOp.Contains));
+        CRUDModel.EqFilters.Add(Prop2, new Tuple<object, ODataFilterOp>($"'{searchTerm}'", ODataFilterOp.Contains));
+
+        var response = await ODataCRUDHandler.Get(CRUDModel);
+        Patients = Mapper.Map<List<PatientSelectModel>>(response.Value);
+
+        if (Patients?.Count > 0)
+        {
+            isVisible = true;
+        }
+
+        if (ShouldRender())
+        {
+            StateHasChanged();
+        }
+
+        isLoading = false;
+    }
+
+    async Task OnItemSelected(PatientSelectModel item)
+    {
+        isVisible = false;
+        SearchField.Text = item.FullName;
+        await SelectedPatientChanged.InvokeAsync(item.Id);
+    }
+}

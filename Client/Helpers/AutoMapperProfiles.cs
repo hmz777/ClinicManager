@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using ClinicProject.Client.Models.CRUD;
-using ClinicProject.Shared.DTOs;
+using ClinicProject.Client.Models.Patients;
+using ClinicProject.Shared.DTOs.Patients;
 using MudBlazor;
 
 namespace ClinicProject.Client.Helpers
@@ -25,6 +26,14 @@ namespace ClinicProject.Client.Helpers
             {
                 CreateMap<TableState, CRUDModel>()
                    .ForMember(d => d.SortDirection, opt => opt.MapFrom(s => s.SortDirection));
+            }
+        }
+
+        class PatientDTOToSelectModel : Profile
+        {
+            public PatientDTOToSelectModel()
+            {
+                CreateMap<PatientDTO, PatientSelectModel>();
             }
         }
     }
