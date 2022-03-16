@@ -16,7 +16,7 @@
             <MudText Typo="Typo.h6">Filters</MudText>
         </MudItem>
         <MudItem xs="6">
-            <MudTextField Class="my-2" Clearable="true" Label="Full Patient Search" T="string" ValueChanged="@(s=> OnSearch(s, "Search"))" Variant="Variant.Outlined" Adornment="Adornment.End"
+            <MudTextField Class="my-2" Clearable="true" Label="Full Search" T="string" ValueChanged="@(s=> OnSearch(s, "Search"))" Variant="Variant.Outlined" Adornment="Adornment.End"
                           AdornmentIcon="@Icons.Material.Outlined.Edit" AdornmentColor="Color.Primary" IconSize="Size.Medium"></MudTextField>
             <MudDivider Class="my-2" />
             @foreach (var item in PropertyAttributes.Where(i => i.Value?.DataField != DataField.Navigation && i.Value?.Searchable == true))
@@ -68,7 +68,7 @@
         </MudItem>
         <MudItem xs="12">
             <MudButtonGroup OverrideStyles="false" Class="mr-2">
-                <MudButton StartIcon="@Icons.Material.Outlined.Add" Variant="Variant.Filled" Color="Color.Primary" OnClick="OnAddPatientBatchPart">Add Patient</MudButton>
+                <MudButton StartIcon="@Icons.Material.Outlined.Add" Variant="Variant.Filled" Color="Color.Primary" OnClick="OnAddPatientBatchPart">Create New</MudButton>
                 <MudButton StartIcon="@Icons.Material.Outlined.Delete" Disabled="@(!CanDelete)" Variant="Variant.Filled" Color="Color.Error" OnClick="OnDeleteBatchPart">Delete</MudButton>
             </MudButtonGroup>
             <MudButtonGroup OverrideStyles="false" Class="mr-2">
@@ -121,7 +121,7 @@
             {
                 if (property.Value.DataField != DataField.Navigation)
                 {
-                    if (property.Key.PropertyType == typeof(DateTime))
+                    if (property.Key.PropertyType == typeof(DateTime) || property.Key.PropertyType == typeof(DateTime?))
                     {
                         <MudTd DataLabel="@(property.Key.Name)">@context.DateValues[property.Key.Name]?.ToString("dd/MM/yyyy - (hh:mm tt)")</MudTd>
                     }
