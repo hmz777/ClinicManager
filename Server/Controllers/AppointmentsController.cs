@@ -3,7 +3,9 @@ using AutoMapper;
 using AutoMapper.AspNet.OData;
 using ClinicProject.Server.Data;
 using ClinicProject.Server.Data.DBModels.AppointmentsTypes;
-using ClinicProject.Shared.DTOs;
+using ClinicProject.Server.Data.DBModels.PatientTypes;
+using ClinicProject.Shared.DTOs.Appointments;
+using ClinicProject.Shared.Models.Error;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
@@ -12,8 +14,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClinicProject.Server.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
     public class AppointmentsController : ODataController
     {
         private readonly ApplicationDbContext _context;
@@ -25,32 +25,37 @@ namespace ClinicProject.Server.Controllers
             this.mapper = mapper;
         }
 
-        // GET: api/Appointments
         [HttpGet]
-        public async Task<IActionResult> GetAppointments(ODataQueryOptions<AppointmentDTO> options)
+        public async Task<IActionResult> Get(ODataQueryOptions<AppointmentDTO> options)
         {
             var query = await _context.Appointments.GetQueryAsync<AppointmentDTO, Appointment>(mapper, options);
-
             return Ok(await query.ToListAsync());
         }
 
-        // GET: api/Appointments/5
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetAppointment([FromODataUri] int id, ODataQueryOptions<AppointmentDTO> options)
+        [HttpGet]
+        public async Task<IActionResult> Get([FromODataUri] int key, ODataQueryOptions<AppointmentDTO> options)
         {
-            var result = await _context.Appointments.Where(p => p.Id == id).GetQueryAsync(mapper, options);
+            var result = await _context.Appointments.Where(p => p.Id == key).GetQueryAsync(mapper, options);
             return Ok(await result.FirstOrDefaultAsync());
         }
 
-        // PUT: api/Appointments/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
+        [HttpPut]
         [EnableQuery]
-        public async Task<IActionResult> PutAppointment([FromODataUri] int id, [FromODataBody] AppointmentDTO appointmentDTO)
+        public async Task<IActionResult> Put([FromODataUri] int key, [FromODataBody] AppointmentDTO appointmentDTO)
         {
-            if (!ModelState.IsValid || id != appointmentDTO.Id)
-            {
+            if (key != appointmentDTO.Id)
                 return BadRequest();
+
+            if (!ModelState.IsValid)
+            {
+                var ValidationErrors = new ModelValidationResult
+                {
+                    Results = ModelState.ToDictionary(
+                        m => m.Key,
+                        m => string.Join('\n', m.Value.Errors.Select(e => e.ErrorMessage)))
+                };
+
+                return BadRequest(ValidationErrors);
             }
 
             _context.Entry(mapper.Map<Appointment>(appointmentDTO)).State = EntityState.Modified;
@@ -61,7 +66,7 @@ namespace ClinicProject.Server.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!AppointmentExists(id))
+                if (!AppointmentExists(key))
                 {
                     return NotFound();
                 }
@@ -74,25 +79,46 @@ namespace ClinicProject.Server.Controllers
             return NoContent();
         }
 
-        // POST: api/Appointments
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [EnableQuery]
-        public async Task<ActionResult<Appointment>> PostAppointment([FromODataBody] AppointmentDTO appointmentDTO)
+        public async Task<ActionResult<Appointment>> Post([FromODataBody] AppointmentDTO appointmentDTO)
         {
             if (!ModelState.IsValid)
-                return BadRequest();
+            {
+                var ValidationErrors = new ModelValidationResult
+                {
+                    Results = ModelState.ToDictionary(
+                        m => m.Key,
+                        m => string.Join('\n', m.Value.Errors.Select(e => e.ErrorMessage)))
+                };
 
-            await _context.Appointments.AddAsync(mapper.Map<Appointment>(appointmentDTO));
+                return BadRequest(ValidationErrors);
+            }
+
+            Patient patient = await _context.Patients
+                .Include(p => p.Appointments)
+                .Where(p => p.Id == appointmentDTO.PatientDTO.Id)
+                .FirstOrDefaultAsync();
+
+            if (patient == null)
+            {
+                return BadRequest(new ModelValidationResult { Results = new Dictionary<string, string>() { ["Patient.Id"] = "Patient not found." } });
+            }
+
+            var appointment = mapper.Map<Appointment>(appointmentDTO);
+
+            patient.Appointments.Add(appointment);
+
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetAppointment", new { id = appointmentDTO.Id }, appointmentDTO);
+            appointmentDTO.Id = appointment.Id;
+
+            return CreatedAtAction(nameof(Get), new { key = appointmentDTO.Id }, appointmentDTO);
         }
 
-        // DELETE: api/Appointments/5
-        [HttpDelete("{id}")]
+        [HttpDelete]
         [EnableQuery]
-        public async Task<IActionResult> DeleteAppointment([FromODataUri] int id)
+        public async Task<IActionResult> Delete([FromODataUri] int id)
         {
             var appointment = await _context.Appointments.FindAsync(id);
             if (appointment == null)
