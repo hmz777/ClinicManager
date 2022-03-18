@@ -1,4 +1,5 @@
-﻿using ClinicProject.Shared.DTOs.Patients;
+﻿using ClinicProject.Shared.DTOs.Appointments;
+using ClinicProject.Shared.DTOs.Patients;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 
@@ -16,6 +17,11 @@ namespace ClinicProject.Server.Helpers
             if (context.Metadata.ModelType == typeof(PatientDTO))
             {
                 return new BinderTypeModelBinder(typeof(DTOModelBinder<PatientDTO>));
+            }
+
+            if (context.Metadata.ModelType == typeof(AppointmentDTO))
+            {
+                return new BinderTypeModelBinder(typeof(DTOModelBinder<AppointmentDTO>));
             }
 
             return null;
