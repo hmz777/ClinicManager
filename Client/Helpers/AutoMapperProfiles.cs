@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using ClinicProject.Client.Models.CRUD;
 using ClinicProject.Client.Models.Patients;
+using ClinicProject.Shared.DTOs;
+using ClinicProject.Shared.DTOs.Appointments;
 using ClinicProject.Shared.DTOs.Patients;
 using MudBlazor;
 
@@ -8,11 +10,11 @@ namespace ClinicProject.Client.Helpers
 {
     public class AutoMapperProfiles
     {
-        class Patient2Patient : Profile
+        class DTOBaseMaps : Profile
         {
-            public Patient2Patient()
+            public DTOBaseMaps()
             {
-                CreateMap<PatientDTO, PatientDTO>()
+                CreateMap<DTOBase, DTOBase>()
                     .ForMember(d => d.StringValues, opt => opt.Ignore())
                     .ForMember(d => d.IntValues, opt => opt.Ignore())
                     .ForMember(d => d.DateValues, opt => opt.Ignore())
@@ -20,20 +22,33 @@ namespace ClinicProject.Client.Helpers
             }
         }
 
-        class TableState2CRUDModel : Profile
+        class PatientDTOMaps : Profile
         {
-            public TableState2CRUDModel()
+            public PatientDTOMaps()
             {
-                CreateMap<TableState, CRUDModel>()
-                   .ForMember(d => d.SortDirection, opt => opt.MapFrom(s => s.SortDirection));
+                CreateMap<PatientDTO, PatientDTO>()
+                    .IncludeBase<DTOBase, DTOBase>();
+
+                CreateMap<PatientDTO, PatientSelectModel>();
             }
         }
 
-        class PatientDTOToSelectModel : Profile
+        class AppointmentDTOMaps : Profile
         {
-            public PatientDTOToSelectModel()
+            public AppointmentDTOMaps()
             {
-                CreateMap<PatientDTO, PatientSelectModel>();
+                CreateMap<AppointmentDTO, AppointmentDTO>()
+                    .ForMember(d => d.FirstName, opt => opt.Ignore())
+                    .ForMember(d => d.LastName, opt => opt.Ignore());
+            }
+        }
+
+        class CRUDMaps : Profile
+        {
+            public CRUDMaps()
+            {
+                CreateMap<TableState, CRUDModel>()
+                   .ForMember(d => d.SortDirection, opt => opt.MapFrom(s => s.SortDirection));
             }
         }
     }

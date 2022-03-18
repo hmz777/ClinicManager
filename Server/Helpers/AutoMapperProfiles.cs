@@ -13,17 +13,17 @@ namespace ClinicProject.Server.Helpers
 {
     public class AutoMapperProfiles
     {
-        public class BaseProfile : Profile
+        public class BaseMaps : Profile
         {
-            public BaseProfile()
+            public BaseMaps()
             {
                 CreateMap<DBEntityBase, DTOBase>().ReverseMap();
             }
         }
 
-        public class PatientProfile : Profile
+        public class PatientMaps : Profile
         {
-            public PatientProfile()
+            public PatientMaps()
             {
                 CreateMap<Patient, PatientDTO>()
                     .IncludeBase<DBEntityBase, DTOBase>()
@@ -40,19 +40,20 @@ namespace ClinicProject.Server.Helpers
             }
         }
 
-        public class AppointmentProfile : Profile
+        public class AppointmentMaps : Profile
         {
-            public AppointmentProfile()
+            public AppointmentMaps()
             {
                 CreateMap<Appointment, AppointmentDTO>()
                     .IncludeBase<DBEntityBase, DTOBase>()
+                    .ForMember(s => s.Patient, opt => opt.ExplicitExpansion())
                     .ReverseMap();
             }
         }
 
-        public class TreatmentProfile : Profile
+        public class TreatmentMaps : Profile
         {
-            public TreatmentProfile()
+            public TreatmentMaps()
             {
                 CreateMap<Treatment, TreatmentDTO>()
                     .IncludeBase<DBEntityBase, DTOBase>()
@@ -60,27 +61,27 @@ namespace ClinicProject.Server.Helpers
             }
         }
 
-        public class PaymentProfile : Profile
+        public class PaymentMaps : Profile
         {
-            public PaymentProfile()
+            public PaymentMaps()
             {
                 CreateMap<Payment, PaymentDTO>()
                     .IncludeBase<DBEntityBase, DTOBase>();
             }
         }
 
-        public class NotesProfile : Profile
+        public class NoteMaps : Profile
         {
-            public NotesProfile()
+            public NoteMaps()
             {
                 CreateMap<Note, NoteDTO>()
                     .IncludeBase<DBEntityBase, DTOBase>();
             }
         }
 
-        public class ExtraDataProfile : Profile
+        public class ExtraDataPMaps : Profile
         {
-            public ExtraDataProfile()
+            public ExtraDataPMaps()
             {
                 CreateMap<ExtraData, ExtraDataDTO>()
                     .IncludeBase<DBEntityBase, DTOBase>();
