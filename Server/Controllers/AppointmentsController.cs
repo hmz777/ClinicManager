@@ -7,7 +7,6 @@ using ClinicProject.Server.Data.DBModels.PatientTypes;
 using ClinicProject.Shared.DTOs.Appointments;
 using ClinicProject.Shared.Models.Error;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +32,7 @@ namespace ClinicProject.Server.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get([FromODataUri] int key, ODataQueryOptions<AppointmentDTO> options)
+        public async Task<IActionResult> Get(int key, ODataQueryOptions<AppointmentDTO> options)
         {
             var result = await _context.Appointments.Where(p => p.Id == key).GetQueryAsync(mapper, options);
             return Ok(await result.FirstOrDefaultAsync());
@@ -41,7 +40,7 @@ namespace ClinicProject.Server.Controllers
 
         [HttpPut]
         [EnableQuery]
-        public async Task<IActionResult> Put([FromODataUri] int key, [FromODataBody] AppointmentDTO appointmentDTO)
+        public async Task<IActionResult> Put(int key, [FromBody] AppointmentDTO appointmentDTO)
         {
             if (key != appointmentDTO.Id)
                 return BadRequest();
@@ -81,7 +80,7 @@ namespace ClinicProject.Server.Controllers
 
         [HttpPost]
         [EnableQuery]
-        public async Task<ActionResult<Appointment>> Post([FromODataBody] AppointmentDTO appointmentDTO)
+        public async Task<IActionResult> Post([FromBody] AppointmentDTO appointmentDTO)
         {
             if (!ModelState.IsValid)
             {
@@ -97,7 +96,7 @@ namespace ClinicProject.Server.Controllers
 
             Patient patient = await _context.Patients
                 .Include(p => p.Appointments)
-                .Where(p => p.Id == appointmentDTO.PatientDTO.Id)
+                .Where(p => p.Id == appointmentDTO.Patient.Id)
                 .FirstOrDefaultAsync();
 
             if (patient == null)
@@ -118,9 +117,9 @@ namespace ClinicProject.Server.Controllers
 
         [HttpDelete]
         [EnableQuery]
-        public async Task<IActionResult> Delete([FromODataUri] int id)
+        public async Task<IActionResult> Delete(int key)
         {
-            var appointment = await _context.Appointments.FindAsync(id);
+            var appointment = await _context.Appointments.FindAsync(key);
             if (appointment == null)
             {
                 return NotFound();
