@@ -232,6 +232,27 @@ namespace ClinicProject.Client.Services
                 }
             }
 
+            if (crudModel.HasExpand())
+            {
+                var expand = "$expand=";
+
+                foreach (var item in crudModel.ExpandedProperties)
+                {
+                    expand += $"{item} and ";
+                }
+
+                if (expand.EndsWith("and "))
+                {
+                    expand = expand.Remove(expand.Length - 4);
+                }
+
+                if (!expand.EndsWith('='))
+                {
+                    expand += "&";
+                    query += expand;
+                }
+            }
+
             query += $"$count=true";
 
             return query;

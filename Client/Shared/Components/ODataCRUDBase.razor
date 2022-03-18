@@ -49,6 +49,10 @@
                             }
                         </MudSelect>
                         break;
+                    case DataField.TextNavigationExpanded:
+                        <MudTextField Class="my-2" Clearable="true" Label="@(item.Value.DisplayName)" T="string" ValueChanged="@(s => OnSearch(s, item.Value.ExpandedFrom + "/" + item.Key.Name))" Variant="Variant.Outlined" Adornment="Adornment.End"
+                          AdornmentIcon="@Icons.Material.Outlined.Edit" AdornmentColor="Color.Primary" IconSize="Size.Medium"></MudTextField>
+                        break;
                     default:
                         break;
                 }

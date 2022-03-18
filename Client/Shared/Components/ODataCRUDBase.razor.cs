@@ -42,6 +42,7 @@ namespace ClinicProject.Client.Shared.Components
         DateRange? CreateDateRange { get; set; }
         DateRange? UpdateDateRange { get; set; }
 
+        public List<string> ExpandedProperties { get; set; } = new();
         public Type DialogType { get; set; }
 
         public ODataBatchRequestModel<T> BatchModel { get; set; } = new();
@@ -206,6 +207,8 @@ namespace ClinicProject.Client.Shared.Components
             crudModel.SearchString = SearchString;
             crudModel.EqFilters = EqFilters;
 
+            crudModel.ExpandedProperties = GetExpandableProperties();
+
             var res = await ODataCRUDHandler.Get(crudModel);
             Items = res.Value;
             BackupItems = Mapper.Map<IEnumerable<T>>(Items);
@@ -226,7 +229,18 @@ namespace ClinicProject.Client.Shared.Components
             if (data == null || fieldType == null)
                 return;
 
-            var property = typeof(T).GetProperties().Where(p => p.Name.ToLower() == fieldType.ToLower()).FirstOrDefault();
+            PropertyInfo? property;
+
+            if (fieldType.Contains('/'))
+            {
+                //We're querying against a nested property
+
+                property = typeof(T).GetProperties().Where(p => p.Name.ToLower() == fieldType.Split('/')[1].ToLower()).FirstOrDefault();
+            }
+            else
+            {
+                property = typeof(T).GetProperties().Where(p => p.Name.ToLower() == fieldType.ToLower()).FirstOrDefault();
+            }
 
             if (property != null)
             {
@@ -234,7 +248,7 @@ namespace ClinicProject.Client.Shared.Components
                 {
                     if (string.IsNullOrWhiteSpace(s))
                     {
-                        EqFilters.Remove(property.Name);
+                        EqFilters.Remove(fieldType);
                         return;
                     }
 
@@ -242,11 +256,11 @@ namespace ClinicProject.Client.Shared.Components
                 }
                 else if (data is ITuple tuple && tuple.HasNull())
                 {
-                    EqFilters.Remove(property.Name);
+                    EqFilters.Remove(fieldType);
                     return;
                 }
 
-                EqFilters[property.Name] = new Tuple<object, ODataFilterOp>(data, ODataFilterOp.Equal);
+                EqFilters[fieldType] = new Tuple<object, ODataFilterOp>(data, ODataFilterOp.Equal);
             }
             else if (fieldType == "Search")
             {
@@ -325,6 +339,24 @@ namespace ClinicProject.Client.Shared.Components
             }
 
             return hasSuccessFlag;
+        }
+
+        List<string> GetExpandableProperties()
+        {
+            var props = new List<string>();
+
+            foreach (var prop in typeof(T).GetProperties())
+            {
+                foreach (var attr in prop.GetCustomAttributes())
+                {
+                    if (attr is DataFieldAttribute dfa && dfa.Expanded == true)
+                    {
+                        props.Add(prop.Name);
+                    }
+                }
+            }
+
+            return props;
         }
 
         #endregion

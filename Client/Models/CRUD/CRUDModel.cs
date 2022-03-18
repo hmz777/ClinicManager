@@ -13,6 +13,7 @@
         public DateTime? UpdatedUntil { get; set; }
         public Dictionary<string, Tuple<object, ODataFilterOp>> EqFilters { get; set; }
         public List<string> SelectedProperties { get; set; }
+        public List<string> ExpandedProperties { get; set; }
         public bool HasFilter()
         {
             return (EqFilters != null && EqFilters.Count > 0)
@@ -30,6 +31,11 @@
         public bool HasSearch()
         {
             return !string.IsNullOrWhiteSpace(SearchString);
+        }
+
+        public bool HasExpand()
+        {
+            return ExpandedProperties != null && ExpandedProperties.Count > 0;
         }
     }
 }

@@ -18,7 +18,7 @@ namespace ClinicProject.Client.Shared.Dialogs.Appointments
         {
             if (Form.IsValid)
             {
-                Model.PatientDTO = new PatientDTO { Id = SelectedPatient };
+                Model.Patient = new PatientDTO { Id = SelectedPatient };
                 MudDialog.Close(DialogResult.Ok(Model));
             }
         }
