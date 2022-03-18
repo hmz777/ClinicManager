@@ -15,14 +15,14 @@ namespace ClinicProject.Shared.DTOs
         [DataField(DisplayName = "Id", DataField = DataField.Empty, EditPreview = true)]
         public int Id { get; set; }
 
-        [DataField(DisplayName = "Creation Date", DataField = DataField.DateTime, EditPreview = true)]
+        [DataField(DisplayName = "Creation Date", DataField = DataField.DateTime)]
         public virtual DateTime CreationDate { get; set; }
 
-        [DataField(DisplayName = "Update Date", DataField = DataField.DateTime, EditPreview = true)]
+        [DataField(DisplayName = "Update Date", DataField = DataField.DateTime)]
         public virtual DateTime UpdateDate { get; set; }
 
         [JsonIgnore]
-        private IndexedProperty<string, object> _objValues;
+        private IndexedProperty<string, object>? _objValues;
 
         [JsonIgnore]
         [NotMapped]
@@ -42,7 +42,7 @@ namespace ClinicProject.Shared.DTOs
         }
 
         [JsonIgnore]
-        private IndexedProperty<string, string> _strValues;
+        private IndexedProperty<string, string>? _strValues;
 
         [JsonIgnore]
         [NotMapped]
@@ -62,7 +62,7 @@ namespace ClinicProject.Shared.DTOs
         }
 
         [JsonIgnore]
-        private IndexedProperty<string, int> _intValues;
+        private IndexedProperty<string, int>? _intValues;
 
         [JsonIgnore]
         [NotMapped]
@@ -82,7 +82,7 @@ namespace ClinicProject.Shared.DTOs
         }
 
         [JsonIgnore]
-        private IndexedProperty<string, DateTime?> _dateValues;
+        private IndexedProperty<string, DateTime?>? _dateValues;
 
         [JsonIgnore]
         [NotMapped]
