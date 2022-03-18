@@ -49,6 +49,14 @@ namespace ClinicProject.Server.Data
 
             #endregion
 
+            #region Appointments
+
+            builder.Entity<Appointment>()
+                .HasOne(a => a.Patient)
+                .WithMany(p => p.Appointments);
+
+            #endregion
+
             #region Treatments
 
             builder.Entity<Treatment>()
