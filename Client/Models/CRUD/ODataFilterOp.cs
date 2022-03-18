@@ -5,6 +5,6 @@
         Equal = 1,
         Contains = 2,
         GreaterThan = 4,
-        LessThan = 8,
+        LessThan = 8
     }
 }
