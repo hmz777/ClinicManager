@@ -8,5 +8,7 @@
         public bool Editable { get; set; }
         public bool EditPreview { get; set; }
         public bool Searchable { get; set; }
+        public bool Expanded { get; set; }
+        public string ExpandedFrom { get; set; }
     }
 }
