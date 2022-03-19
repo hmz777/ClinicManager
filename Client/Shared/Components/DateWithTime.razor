@@ -1,0 +1,39 @@
+﻿<div class="d-flex flex-column">
+    <div class="d-flex">
+        <MudDatePicker Class="me-2" Label="@DateLabel" DateFormat="@DateFormat" DateChanged="(date) => OnDateChanged(date)" Variant="Variant.Outlined" Color="Color.Primary" />
+        <MudTimePicker Label="@TimeLabel" AmPm="true" TimeFormat="@TimeFormat" TimeChanged="(time) => OnTimeChanged(time)" Variant="Variant.Outlined" Color="Color.Primary" />
+    </div>
+    <MudButton Class="ms-auto mt-2" Variant="Variant.Filled" Color="Color.Primary">Update</MudButton>
+</div>
+
+@code {
+    [Parameter] public string DateLabel { get; set; }
+    [Parameter] public string TimeLabel { get; set; }
+    [Parameter] public string DateFormat { get; set; }
+    [Parameter] public string TimeFormat { get; set; }
+    [Parameter] public DateTime? Date { get; set; }
+    [Parameter] public EventCallback<DateTime?> DateChanged { get; set; }
+
+    DateTime? DateInternal { get; set; }
+    TimeSpan? TimeInternal { get; set; }
+
+    void OnDateChanged(DateTime? date)
+    {
+        DateInternal = date;
+    }
+
+    void OnTimeChanged(TimeSpan? time)
+    {
+        TimeInternal = time;
+    }
+
+    async Task UpdateValues()
+    {
+        if (DateInternal.HasValue && TimeInternal.HasValue)
+        {
+            DateInternal = DateInternal.Value.Add(TimeInternal.Value);
+
+            await DateChanged.InvokeAsync(DateInternal);
+        }
+    }
+}

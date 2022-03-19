@@ -1,0 +1,30 @@
+﻿<MudDateRangePicker Label="@Label"
+                    Class="@Class"
+                    DateRangeChanged="@((dateRange) => OnDateRangeChanged(dateRange))"
+                    Variant="Variant.Outlined"
+                    Color="Color.Primary"
+                    AdornmentColor="Color.Primary"
+                    DateFormat="@DateFormat"
+                    @ref="picker">
+    <PickerActions>
+        <MudButton Class="mr-auto align-self-start" OnClick="@(() => picker.Clear())">Clear</MudButton>
+        <MudButton OnClick="@(() => picker.Close(false))">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="@(() => picker.Close())">Ok</MudButton>
+    </PickerActions>
+</MudDateRangePicker>
+
+@code {
+    [Parameter] public string Label { get; set; }
+    [Parameter] public string Class { get; set; }
+    [Parameter] public string DateFormat { get; set; }
+
+    [Parameter] public DateRange DateRange { get; set; }
+    [Parameter] public EventCallback<DateRange> DateRangeChanged { get; set; }
+
+    MudDateRangePicker picker;
+
+    async Task OnDateRangeChanged(DateRange dateRange)
+    {
+        await DateRangeChanged.InvokeAsync(dateRange);
+    }
+}
