@@ -32,7 +32,7 @@
                              AdornmentIcon="@Icons.Material.Outlined.Edit" AdornmentColor="Color.Primary" IconSize="Size.Medium"></MudNumericField>
                         break;
                     case DataField.DateTime:
-                        <DirectionalDatePicker Class="my-2" Label="@(item.Value.DisplayName)" DataChanged="@(s => OnSearch(s, item.Key.Name))" />
+                        <CustomDateRange DateFormat="dd/MM/yyyy" Class="my-2" Label="@(item.Value.DisplayName)" DateRangeChanged="@(s => OnSearch(s, item.Key.Name))" />
                         break;
                     case DataField.Enum:
                         <MudSelect T="object" ValueChanged="@(s => OnSearch(s?.ToString(), item.Key.Name))"
@@ -59,10 +59,8 @@
             }
         </MudItem>
         <MudItem xs="6">
-            <MudDateRangePicker AdornmentColor="Color.Primary" Variant="Variant.Outlined" Label="Creation Date Range" @bind-DateRange="CreateDateRange" DateFormat="dd/MM/yyyy" />
-            <MudButton Class="my-2" StartIcon="@Icons.Material.Outlined.Clear" Variant="Variant.Filled" Color="Color.Error" OnClick="ClearCreateDateRange">Clear</MudButton>
-            <MudDateRangePicker AdornmentColor="Color.Primary" Variant="Variant.Outlined" Label="Update Date Range" @bind-DateRange="UpdateDateRange" DateFormat="dd/MM/yyyy" />
-            <MudButton Class="mt-2" StartIcon="@Icons.Material.Outlined.Clear" Variant="Variant.Filled" Color="Color.Error" OnClick="ClearUpdateDateRange">Clear</MudButton>
+            <CustomDateRange Class="mb-2" Label="Creation Date Range" DateRangeChanged="@((dateRange) => OnSearch(dateRange, "CreationDate"))" DateFormat="dd/MM/yyyy" />
+            <CustomDateRange Label="Update Date Range" DateRangeChanged="@((dateRange) => OnSearch(dateRange, "UpdateDate"))" DateFormat="dd/MM/yyyy" />
         </MudItem>
         <MudItem xs="12">
             <MudButton StartIcon="@Icons.Material.Outlined.Search" Variant="Variant.Filled" Color="Color.Success" OnClick="DoSearch">Search</MudButton>

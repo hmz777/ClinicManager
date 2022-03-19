@@ -3,8 +3,6 @@
     public enum ODataFilterOp : int
     {
         Equal = 1,
-        Contains = 2,
-        GreaterThan = 4,
-        LessThan = 8
+        Contains = 2
     }
 }

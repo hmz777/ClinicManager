@@ -1,5 +1,4 @@
-﻿using ClinicProject.Client.Helpers;
-using ClinicProject.Client.Models.CRUD;
+﻿using ClinicProject.Client.Models.CRUD;
 using ClinicProject.Client.Services;
 using ClinicProject.Shared.Attributes;
 using ClinicProject.Shared.DTOs;
@@ -8,7 +7,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Options;
 using MudBlazor;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 namespace ClinicProject.Client.Shared.Components
@@ -38,9 +36,7 @@ namespace ClinicProject.Client.Shared.Components
         bool CanClearSelection = false;
 
         string? SearchString { get; set; }
-        Dictionary<string, Tuple<object, ODataFilterOp>> EqFilters { get; set; } = new();
-        DateRange? CreateDateRange { get; set; }
-        DateRange? UpdateDateRange { get; set; }
+        Dictionary<string, Tuple<object, ODataFilterOp, ODataOperand>> EqFilters { get; set; } = new();
 
         public List<string> ExpandedProperties { get; set; } = new();
         public Type DialogType { get; set; }
@@ -198,12 +194,6 @@ namespace ClinicProject.Client.Shared.Components
 
             var crudModel = Mapper.Map<CRUDModel>(tableState);
 
-            crudModel.CreatedFrom = CreateDateRange?.Start;
-            crudModel.CreatedUntil = CreateDateRange?.End;
-
-            crudModel.UpdatedFrom = UpdateDateRange?.Start;
-            crudModel.UpdatedUntil = UpdateDateRange?.End;
-
             crudModel.SearchString = SearchString;
             crudModel.EqFilters = EqFilters;
 
@@ -226,7 +216,7 @@ namespace ClinicProject.Client.Shared.Components
 
         void OnSearch(object data, string fieldType)
         {
-            if (data == null || fieldType == null)
+            if (fieldType == null)
                 return;
 
             PropertyInfo? property;
@@ -244,7 +234,12 @@ namespace ClinicProject.Client.Shared.Components
 
             if (property != null)
             {
-                if (data is string s)
+                if (data is null)
+                {
+                    EqFilters.Remove(fieldType);
+                    return;
+                }
+                else if (data is string s)
                 {
                     if (string.IsNullOrWhiteSpace(s))
                     {
@@ -254,13 +249,8 @@ namespace ClinicProject.Client.Shared.Components
 
                     data = $"'{s}'";
                 }
-                else if (data is ITuple tuple && tuple.HasNull())
-                {
-                    EqFilters.Remove(fieldType);
-                    return;
-                }
 
-                EqFilters[fieldType] = new Tuple<object, ODataFilterOp>(data, ODataFilterOp.Equal);
+                EqFilters[fieldType] = new Tuple<object, ODataFilterOp, ODataOperand>(data, ODataFilterOp.Equal, ODataOperand.and);
             }
             else if (fieldType == "Search")
             {
@@ -272,20 +262,6 @@ namespace ClinicProject.Client.Shared.Components
         {
             Table.NavigateTo(Page.First);
             await Table.ReloadServerData();
-        }
-
-        #endregion
-
-        #region Date Filter
-
-        void ClearCreateDateRange()
-        {
-            CreateDateRange = null;
-        }
-
-        void ClearUpdateDateRange()
-        {
-            UpdateDateRange = null;
         }
 
         #endregion

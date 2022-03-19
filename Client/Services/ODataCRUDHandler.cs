@@ -3,10 +3,10 @@ using ClinicProject.Client.Models.CRUD;
 using ClinicProject.Shared.DTOs;
 using ClinicProject.Shared.Models.Error;
 using Microsoft.Extensions.Options;
+using MudBlazor;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 
@@ -133,29 +133,22 @@ namespace ClinicProject.Client.Services
                         if (eqFilter.Value == null)
                             continue;
 
-                        if (eqFilter.Value.Item1 is ITuple tuple && tuple[0] != null)
+                        if (eqFilter.Value.Item1 is DateRange dateRange)
                         {
-                            //We have a date with direction
-                            var date = tuple[0] as DateTime?;
+                            //We have a date range
 
-                            if (tuple[1] is bool directionUp && directionUp == true)
-                            {
-                                filter += $"{eqFilter.Key} gt {date.Value:yyyy-MM-ddTHH:mm:ssZ} and ";
-                            }
-                            else
-                            {
-                                filter += $"{eqFilter.Key} lt {date.Value:yyyy-MM-ddTHH:mm:ssZ} and ";
-                            }
+                            filter += $"({eqFilter.Key} {ODataOperand.gt} {dateRange.Start.Value:yyyy-MM-ddTHH:mm:ssZ} and " +
+                                $"{eqFilter.Key} {ODataOperand.lt} {dateRange.End.Value:yyyy-MM-ddTHH:mm:ssZ}) {eqFilter.Value.Item3} ";
                         }
                         else
                         {
                             switch (eqFilter.Value.Item2)
                             {
                                 case ODataFilterOp.Equal:
-                                    filter += $"{eqFilter.Key} eq {eqFilter.Value.Item1} and ";
+                                    filter += $"{eqFilter.Key} eq {eqFilter.Value.Item1} {eqFilter.Value.Item3} ";
                                     break;
                                 case ODataFilterOp.Contains:
-                                    filter += $"contains({eqFilter.Key}, {eqFilter.Value.Item1}) and ";
+                                    filter += $"contains({eqFilter.Key}, {eqFilter.Value.Item1}) {eqFilter.Value.Item3} ";
                                     break;
                                 default:
                                     break;
@@ -164,35 +157,10 @@ namespace ClinicProject.Client.Services
                     }
                 }
 
-                if (crudModel.CreatedFrom != null && crudModel.CreatedUntil == null)
+                if (filter.EndsWith(" "))
                 {
-                    filter += $"CreationDate gt {crudModel.CreatedFrom.Value:yyyy-MM-ddTHH:mm:ssZ} and ";
-                }
-                else if (crudModel.CreatedFrom == null && crudModel.CreatedUntil != null)
-                {
-                    filter += $"CreationDate lt {crudModel.CreatedUntil.Value:yyyy-MM-ddTHH:mm:ssZ} and ";
-                }
-                else if (crudModel.CreatedFrom != null && crudModel.CreatedUntil != null)
-                {
-                    filter += $"CreationDate gt {crudModel.CreatedFrom.Value:yyyy-MM-ddTHH:mm:ssZ} and CreationDate lt {crudModel.CreatedUntil.Value:yyyy-MM-ddTHH:mm:ssZ} and ";
-                }
-
-                if (crudModel.UpdatedFrom != null && crudModel.UpdatedUntil == null)
-                {
-                    filter += $"UpdateDate gt {crudModel.UpdatedFrom.Value:yyyy-MM-ddTHH:mm:ssZ}";
-                }
-                else if (crudModel.UpdatedFrom == null && crudModel.UpdatedUntil != null)
-                {
-                    filter += $"UpdateDate lt {crudModel.UpdatedUntil.Value:yyyy-MM-ddTHH:mm:ssZ}";
-                }
-                else if (crudModel.UpdatedFrom != null && crudModel.UpdatedUntil != null)
-                {
-                    filter += $"UpdateDate gt {crudModel.UpdatedFrom.Value:yyyy-MM-ddTHH:mm:ssZ} and UpdateDate lt {crudModel.UpdatedUntil.Value:yyyy-MM-ddTHH:mm:ssZ}";
-                }
-
-                if (filter.EndsWith("and "))
-                {
-                    filter = filter.Remove(filter.Length - 4);
+                    //Remove the trailing operand
+                    filter = filter.Remove(filter[0..^1].LastIndexOf(" "));
                 }
 
                 if (!filter.EndsWith('='))
@@ -204,7 +172,7 @@ namespace ClinicProject.Client.Services
 
             if (!string.IsNullOrWhiteSpace(crudModel.SortLabel))
             {
-                query += $"$orderby={crudModel.SortLabel} {(crudModel.SortDirection == SortDirection.none ? SortDirection.asc : crudModel.SortDirection)}&";
+                query += $"$orderby={crudModel.SortLabel} {(crudModel.SortDirection == Models.CRUD.SortDirection.none ? Models.CRUD.SortDirection.asc : crudModel.SortDirection)}&";
             }
             else
             {

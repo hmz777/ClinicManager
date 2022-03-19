@@ -16,10 +16,7 @@
                     <MudSelectItem Value="@item" />
                 }
             </MudSelect>
-            <MudDatePicker Variant="Variant.Outlined"
-                           Label="Date"
-                           @bind-Date="Model.DateValues[nameof(AppointmentDTO.Date)]"
-                           DateFormat="dd/MM/yyyy - (hh:mm tt)" />
+            <DateWithTime DateLabel="Date" TimeLabel="Time" @bind-Date="Model.DateValues[nameof(AppointmentDTO.Date)]" DateFormat="dd/MM/yyyy" TimeFormat="hh:mm tt" />
         </MudForm>
     </DialogContent>
     <DialogActions>
