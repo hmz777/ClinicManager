@@ -46,7 +46,7 @@
                 PageSize = -1,
                 Page = -1,
                 SelectedProperties = new List<string> { "Id", Prop1, Prop2 },
-                EqFilters = new Dictionary<string, Tuple<object, ODataFilterOp>>()
+                EqFilters = new Dictionary<string, Tuple<object, ODataFilterOp, ODataOperand>>()
             };
     }
 
@@ -61,8 +61,8 @@
         isLoading = true;
 
         CRUDModel.EqFilters.Clear();
-        CRUDModel.EqFilters.Add(Prop1, new Tuple<object, ODataFilterOp>($"'{searchTerm}'", ODataFilterOp.Contains));
-        CRUDModel.EqFilters.Add(Prop2, new Tuple<object, ODataFilterOp>($"'{searchTerm}'", ODataFilterOp.Contains));
+        CRUDModel.EqFilters.Add(Prop1, new Tuple<object, ODataFilterOp, ODataOperand>($"'{searchTerm}'", ODataFilterOp.Contains, ODataOperand.or));
+        CRUDModel.EqFilters.Add(Prop2, new Tuple<object, ODataFilterOp, ODataOperand>($"'{searchTerm}'", ODataFilterOp.Contains, ODataOperand.or));
 
         var response = await ODataCRUDHandler.Get(CRUDModel);
         Patients = Mapper.Map<List<PatientSelectModel>>(response.Value);
