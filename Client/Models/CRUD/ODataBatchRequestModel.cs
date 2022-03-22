@@ -1,9 +1,10 @@
 ﻿using ClinicProject.Client.Services;
+using ClinicProject.Shared.DTOs;
 using System.Text.Json.Serialization;
 
 namespace ClinicProject.Client.Models.CRUD
 {
-    public class ODataBatchRequestModel<T>
+    public class ODataBatchRequestModel<T> where T : DTOBase
     {
         public List<ODataBatchRequest<T>> Requests { get; set; } = new();
 
@@ -13,7 +14,7 @@ namespace ClinicProject.Client.Models.CRUD
         }
     }
 
-    public class ODataBatchRequest<T>
+    public class ODataBatchRequest<T> where T : DTOBase
     {
         public ODataBatchRequest(HttpMethod httpMethod, T body, object key)
         {
@@ -44,6 +45,8 @@ namespace ClinicProject.Client.Models.CRUD
                         {
                             Url += "/" + key;
                         }
+
+                        Body.UpdateDate = DateTime.UtcNow;
 
                         break;
                     }
