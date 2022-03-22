@@ -16,8 +16,5 @@ namespace ClinicProject.Server.Data.DBModels.ModelBaseTypes
         public int Id { get; set; }
         public virtual DateTime CreationDate { get; set; }
         public virtual DateTime UpdateDate { get; set; }
-
-        [NotMapped]
-        public string ODataType { get; set; } = string.Empty;
     }
 }
