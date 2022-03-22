@@ -1,9 +1,36 @@
 ﻿<div class="d-flex flex-column">
     <div class="d-flex">
-        <MudDatePicker Class="me-2" Label="@DateLabel" DateFormat="@DateFormat" DateChanged="(date) => OnDateChanged(date)" Variant="Variant.Outlined" Color="Color.Primary" />
-        <MudTimePicker Label="@TimeLabel" AmPm="true" TimeFormat="@TimeFormat" TimeChanged="(time) => OnTimeChanged(time)" Variant="Variant.Outlined" Color="Color.Primary" />
+        <MudDatePicker PickerVariant="@PickerVariant"
+                       @ref="datePicker"
+                       Class="me-2"
+                       Label="@DateLabel"
+                       DateFormat="@DateFormat"
+                       Date="DateInternal"
+                       DateChanged="(date) => OnDateChanged(date)"
+                       Variant="@Variant"
+                       Color="Color.Primary" Required>
+            <PickerActions>
+                <MudButton Class="mr-auto align-self-start" OnClick="@(() => datePicker.Clear())">Clear</MudButton>
+                <MudButton OnClick="@(() => datePicker.Close(false))">Cancel</MudButton>
+                <MudButton Color="Color.Primary" OnClick="@(() => datePicker.Close())">Ok</MudButton>
+            </PickerActions>
+        </MudDatePicker>
+        <MudTimePicker PickerVariant="@PickerVariant"
+                       @ref="timePicker"
+                       Label="@TimeLabel"
+                       AmPm="true"
+                       TimeFormat="@TimeFormat"
+                       Time="TimeInternal"
+                       TimeChanged="(time) => OnTimeChanged(time)"
+                       Variant="@Variant"
+                       Color="Color.Primary" Required>
+            <PickerActions>
+                <MudButton Class="mr-auto align-self-start" OnClick="@(() => timePicker.Clear())">Clear</MudButton>
+                <MudButton OnClick="@(() => timePicker.Close(false))">Cancel</MudButton>
+                <MudButton Color="Color.Primary" OnClick="@(() => timePicker.Close())">Ok</MudButton>
+            </PickerActions>
+        </MudTimePicker>
     </div>
-    <MudButton Class="ms-auto mt-2" Variant="Variant.Filled" Color="Color.Primary">Update</MudButton>
 </div>
 
 @code {
@@ -11,29 +38,50 @@
     [Parameter] public string TimeLabel { get; set; }
     [Parameter] public string DateFormat { get; set; }
     [Parameter] public string TimeFormat { get; set; }
+    [Parameter] public Variant Variant { get; set; }
+    [Parameter] public PickerVariant PickerVariant { get; set; }
     [Parameter] public DateTime? Date { get; set; }
     [Parameter] public EventCallback<DateTime?> DateChanged { get; set; }
+
+    MudDatePicker datePicker;
+    MudTimePicker timePicker;
 
     DateTime? DateInternal { get; set; }
     TimeSpan? TimeInternal { get; set; }
 
-    void OnDateChanged(DateTime? date)
+    protected override void OnParametersSet()
     {
-        DateInternal = date;
+        base.OnParametersSet();
+
+        DateInternal = Date?.Date;
+        TimeInternal = Date?.TimeOfDay;
     }
 
-    void OnTimeChanged(TimeSpan? time)
+    async Task OnDateChanged(DateTime? date)
     {
-        TimeInternal = time;
-    }
-
-    async Task UpdateValues()
-    {
-        if (DateInternal.HasValue && TimeInternal.HasValue)
+        if (date.HasValue)
         {
-            DateInternal = DateInternal.Value.Add(TimeInternal.Value);
+            DateInternal = date;
 
-            await DateChanged.InvokeAsync(DateInternal);
+            if (TimeInternal.HasValue)
+            {
+                DateInternal = DateInternal.Value.Date.Add(TimeInternal.Value);
+                await DateChanged.InvokeAsync(DateInternal);
+            }
+        }
+    }
+
+    async Task OnTimeChanged(TimeSpan? time)
+    {
+        if (time.HasValue)
+        {
+            TimeInternal = time;
+
+            if (DateInternal.HasValue)
+            {
+                DateInternal = DateInternal.Value.Date.Add(TimeInternal.Value);
+                await DateChanged.InvokeAsync(DateInternal);
+            }
         }
     }
 }
