@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.OData.Query.Expressions;
+﻿using ClinicProject.Shared.Attributes;
+using Microsoft.AspNetCore.OData.Query.Expressions;
 using Microsoft.OData.UriParser;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace ClinicProject.Server.OData
 {
@@ -32,23 +33,27 @@ namespace ClinicProject.Server.OData
             {
                 var propType = property.PropertyType;
 
-                if (property.GetCustomAttributes(typeof(NotMappedAttribute), true).Length >= 1)
-                    continue;
+                var dataFieldAttribute = property.GetCustomAttributes()
+                    .Where(a => a.GetType() == typeof(DataFieldAttribute))
+                    .Cast<DataFieldAttribute>().FirstOrDefault();
 
-                if (propType == typeof(int))
+                if (dataFieldAttribute != null && dataFieldAttribute.ServerSearchable == true)
                 {
-                    Expression exProp = Expression.Property(source, property.Name);
-                    Expression exString = Expression.Call(exProp, "ToString", typeArguments: null, arguments: null);
-                    Expression exContains = Expression.Call(exString, "Contains", typeArguments: null, arguments: Expression.Constant(searchTermNode.Text));
+                    if (propType == typeof(int))
+                    {
+                        Expression exProp = Expression.Property(source, property.Name);
+                        Expression exString = Expression.Call(exProp, "ToString", typeArguments: null, arguments: null);
+                        Expression exContains = Expression.Call(exString, "Contains", typeArguments: null, arguments: Expression.Constant(searchTermNode.Text));
 
-                    exFin = Expression.OrElse(exFin, exContains);
-                }
-                else if (propType == typeof(string))
-                {
-                    Expression exProp = Expression.Property(source, property.Name);
-                    Expression exContains = Expression.Call(exProp, "Contains", typeArguments: null, arguments: Expression.Constant(searchTermNode.Text));
+                        exFin = Expression.OrElse(exFin, exContains);
+                    }
+                    else if (propType == typeof(string))
+                    {
+                        Expression exProp = Expression.Property(source, property.Name);
+                        Expression exContains = Expression.Call(exProp, "Contains", typeArguments: null, arguments: Expression.Constant(searchTermNode.Text));
 
-                    exFin = Expression.OrElse(exFin, exContains);
+                        exFin = Expression.OrElse(exFin, exContains);
+                    }
                 }
             }
 

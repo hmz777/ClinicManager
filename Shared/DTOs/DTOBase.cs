@@ -1,5 +1,4 @@
 ﻿using ClinicProject.Shared.Attributes;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace ClinicProject.Shared.DTOs
@@ -12,20 +11,19 @@ namespace ClinicProject.Shared.DTOs
             UpdateDate = DateTime.UtcNow;
         }
 
-        [DataField(DisplayName = "Id", DataField = DataField.Empty, EditPreview = true)]
+        [DataField(DisplayName = "Id", DataField = DataField.Empty, EditPreview = true, ServerSearchable = true)]
         public int Id { get; set; }
 
-        [DataField(DisplayName = "Creation Date", DataField = DataField.DateTime)]
+        [DataField(DisplayName = "Creation Date", DataField = DataField.DateTime, ClientSearchable = true)]
         public virtual DateTime CreationDate { get; set; }
 
-        [DataField(DisplayName = "Update Date", DataField = DataField.DateTime)]
+        [DataField(DisplayName = "Update Date", DataField = DataField.DateTime, ClientSearchable = true)]
         public virtual DateTime UpdateDate { get; set; }
 
         [JsonIgnore]
         private IndexedProperty<string, object>? _objValues;
 
         [JsonIgnore]
-        [NotMapped]
         public IndexedProperty<string, object> ObjectValues
         {
             get
@@ -45,7 +43,6 @@ namespace ClinicProject.Shared.DTOs
         private IndexedProperty<string, string>? _strValues;
 
         [JsonIgnore]
-        [NotMapped]
         public IndexedProperty<string, string> StringValues
         {
             get
@@ -65,7 +62,6 @@ namespace ClinicProject.Shared.DTOs
         private IndexedProperty<string, int>? _intValues;
 
         [JsonIgnore]
-        [NotMapped]
         public IndexedProperty<string, int> IntValues
         {
             get
@@ -85,7 +81,6 @@ namespace ClinicProject.Shared.DTOs
         private IndexedProperty<string, DateTime?>? _dateValues;
 
         [JsonIgnore]
-        [NotMapped]
         public IndexedProperty<string, DateTime?> DateValues
         {
             get

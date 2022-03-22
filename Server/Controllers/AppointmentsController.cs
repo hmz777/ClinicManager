@@ -96,7 +96,7 @@ namespace ClinicProject.Server.Controllers
 
             Patient patient = await _context.Patients
                 .Include(p => p.Appointments)
-                .Where(p => p.Id == appointmentDTO.Patient.Id)
+                .Where(p => p.Id == appointmentDTO.PatientId)
                 .FirstOrDefaultAsync();
 
             if (patient == null)

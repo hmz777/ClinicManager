@@ -1,5 +1,4 @@
 ﻿using ClinicProject.Shared.DTOs.Appointments;
-using ClinicProject.Shared.DTOs.Patients;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
@@ -18,7 +17,7 @@ namespace ClinicProject.Client.Shared.Dialogs.Appointments
         {
             if (Form.IsValid)
             {
-                Model.Patient = new PatientDTO { Id = SelectedPatient };
+                Model.PatientId = SelectedPatient;
                 MudDialog.Close(DialogResult.Ok(Model));
             }
         }
