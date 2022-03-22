@@ -1,17 +1,18 @@
-﻿<MudDateRangePicker Label="@Label"
-                    Class="@Class"
-                    DateRangeChanged="@((dateRange) => OnDateRangeChanged(dateRange))"
-                    Variant="Variant.Outlined"
-                    Color="Color.Primary"
-                    AdornmentColor="Color.Primary"
-                    DateFormat="@DateFormat"
-                    @ref="picker">
-    <PickerActions>
-        <MudButton Class="mr-auto align-self-start" OnClick="@(() => picker.Clear())">Clear</MudButton>
-        <MudButton OnClick="@(() => picker.Close(false))">Cancel</MudButton>
-        <MudButton Color="Color.Primary" OnClick="@(() => picker.Close())">Ok</MudButton>
-    </PickerActions>
-</MudDateRangePicker>
+﻿<div class="@Class">
+    <MudDateRangePicker Label="@Label"
+                        DateRangeChanged="@((dateRange) => OnDateRangeChanged(dateRange))"
+                        Variant="Variant.Outlined"
+                        Color="Color.Primary"
+                        AdornmentColor="Color.Primary"
+                        DateFormat="@DateFormat"
+                        @ref="picker">
+        <PickerActions>
+            <MudButton Class="mr-auto align-self-start" OnClick="@(() => picker.Clear())">Clear</MudButton>
+            <MudButton OnClick="@(() => picker.Close(false))">Cancel</MudButton>
+            <MudButton Color="Color.Primary" OnClick="@(() => picker.Close())">Ok</MudButton>
+        </PickerActions>
+    </MudDateRangePicker>
+</div>
 
 @code {
     [Parameter] public string Label { get; set; }
