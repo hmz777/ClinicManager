@@ -19,7 +19,7 @@
             <MudTextField Class="my-2" Clearable="true" Label="Full Search" T="string" ValueChanged="@(s=> OnSearch(s, "Search"))" Variant="Variant.Outlined" Adornment="Adornment.End"
                           AdornmentIcon="@Icons.Material.Outlined.Edit" AdornmentColor="Color.Primary" IconSize="Size.Medium"></MudTextField>
             <MudDivider Class="my-2" />
-            @foreach (var item in PropertyAttributes.Where(i => i.Value?.DataField != DataField.Navigation && i.Value?.Searchable == true))
+            @foreach (var item in PropertyAttributes.Where(i => i.Value?.DataField != DataField.Navigation && i.Value?.ClientSearchable == true))
             {
                 switch (item.Value.DataField)
                 {
@@ -57,10 +57,6 @@
                         break;
                 }
             }
-        </MudItem>
-        <MudItem xs="6">
-            <CustomDateRange Class="mb-2" Label="Creation Date Range" DateRangeChanged="@((dateRange) => OnSearch(dateRange, "CreationDate"))" DateFormat="dd/MM/yyyy" />
-            <CustomDateRange Label="Update Date Range" DateRangeChanged="@((dateRange) => OnSearch(dateRange, "UpdateDate"))" DateFormat="dd/MM/yyyy" />
         </MudItem>
         <MudItem xs="12">
             <MudButton StartIcon="@Icons.Material.Outlined.Search" Variant="Variant.Filled" Color="Color.Success" OnClick="DoSearch">Search</MudButton>
@@ -111,7 +107,14 @@
             {
                 if (property.Value.DataField != DataField.Navigation)
                 {
-                    <MudTh><MudTableSortLabel T="T" SortLabel="@(property.Key.Name)">@property.Value.DisplayName</MudTableSortLabel></MudTh>
+                    if (!string.IsNullOrEmpty(property.Value.ExpandedFrom))
+                    {
+                        <MudTh><MudTableSortLabel T="T" SortLabel="@(property.Value.ExpandedFrom + "/" + property.Key.Name)">@property.Value.DisplayName</MudTableSortLabel></MudTh>
+                    }
+                    else
+                    {
+                        <MudTh><MudTableSortLabel T="T" SortLabel="@(property.Key.Name)">@property.Value.DisplayName</MudTableSortLabel></MudTh>
+                    }
                 }
             }
         }
@@ -147,40 +150,49 @@
                         case DataField.Text:
                             <MudTd>
                                 <MudTextField Label="@(property.Value.DisplayName)"
-                          @bind-Value="@(context.StringValues[property.Key.Name])" Required />
+                          @bind-Value="@(context.StringValues[property.Key.Name])"
+                          Variant="Variant.Outlined"
+                          Required />
                             </MudTd>
                             break;
                         case DataField.MultiLineText:
                             <MudTd>
                                 <MudTextField Label="@(property.Value.DisplayName)"
                           Lines="3"
-                          @bind-Value="@(context.StringValues[property.Key.Name])" Required />
+                          @bind-Value="@(context.StringValues[property.Key.Name])"
+                          Variant="Variant.Outlined"
+                          Required />
                             </MudTd>
                             break;
                         case DataField.Currency:
                         case DataField.Number:
                             <MudTd>
                                 <MudNumericField Label="@(property.Value.DisplayName)"
-                             @bind-Value="@(context.IntValues[property.Key.Name])" Required />
+                             @bind-Value="@(context.IntValues[property.Key.Name])"
+                             Variant="Variant.Outlined" Required />
                             </MudTd>
                             break;
                         case DataField.PhoneNumber:
                             <MudTd>
                                 <MudTextField Label="@(property.Value.DisplayName)"
                           Mask="@(new PatternMask("000000000000000"))"
-                          @bind-Value="@(context.StringValues[property.Key.Name])" Required />
+                          @bind-Value="@(context.StringValues[property.Key.Name])"
+                          Variant="Variant.Outlined" Required />
                             </MudTd>
                             break;
                         case DataField.DateTime:
                             <MudTd>
-                                <MudDatePicker Label="@(property.Value.DisplayName)"
-                           DateFormat="dd/MM/yyyy"
-                           @bind-Date="@(context.DateValues[property.Key.Name])" Required />
+                                <DateWithTime DateLabel="@(property.Value.DisplayName)"
+                          TimeLabel="Time"
+                          DateFormat="dd/MM/yyyy" TimeFormat="hh:mm tt"
+                          @bind-Date="@(context.DateValues[property.Key.Name])"
+                          Variant="Variant.Outlined"
+                          PickerVariant="PickerVariant.Inline" />
                             </MudTd>
                             break;
                         case DataField.Enum:
                             <MudTd>
-                                <MudSelect @bind-Value="@(context.ObjectValues[property.Key.Name])" Required>
+                                <MudSelect Variant="Variant.Outlined" @bind-Value="@(context.ObjectValues[property.Key.Name])" Required>
                                     @foreach (var value in Enum.GetValues(property.Key.PropertyType))
                                     {
                     <MudSelectItem Value="@value">@value.ToString()</MudSelectItem>
