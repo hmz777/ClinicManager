@@ -2,9 +2,7 @@
 {
     public enum AppointmentType : int
     {
-        Type1 = 1,
-        Type2 = 2,
-        Type3 = 4,
-        Type4 = 8,
+        FirstTime = 1,
+        Recurring = 2
     }
 }
