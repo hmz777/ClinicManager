@@ -9,7 +9,7 @@ namespace ClinicProject.Shared.DTOs.Appointments
     {
         public AppointmentDTO()
         {
-            AppointmentType = AppointmentType.Type1;
+            AppointmentType = AppointmentType.FirstTime;
             Date = DateTime.UtcNow;
         }
 
@@ -30,7 +30,7 @@ namespace ClinicProject.Shared.DTOs.Appointments
         [DataField(DisplayName = "Patient", DataField = DataField.Navigation, Expanded = true)]
         public PatientDTO? Patient { get; set; }
 
-        [DataField(DisplayName = "Patient Id")]
+        [DataField(DisplayName = "Patient Id", DataField = DataField.None)]
         public int PatientId { get; set; }
     }
 }
