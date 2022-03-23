@@ -11,6 +11,7 @@
 	  <None Include="Shared\Dialogs\Appointments\AddAppointment.razor" />
 	  <None Include="Shared\Dialogs\Base\AddDialog.razor" />
 	  <None Include="Shared\Dialogs\Patients\AddPatient.razor" />
+	  <None Include="Shared\Dialogs\Treatments\AddTreatment.razor" />
 	</ItemGroup>
 
 	<ItemGroup>

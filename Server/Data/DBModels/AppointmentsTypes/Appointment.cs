@@ -8,6 +8,6 @@ namespace ClinicProject.Server.Data.DBModels.AppointmentsTypes
     {
         public virtual AppointmentType AppointmentType { get; set; }
         public virtual DateTime Date { get; set; }
-        public virtual Patient Patient { get; set; }
+        public virtual Patient? Patient { get; set; }
     }
 }

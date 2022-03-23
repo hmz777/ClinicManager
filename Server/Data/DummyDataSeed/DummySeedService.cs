@@ -42,21 +42,21 @@ namespace ClinicProject.Server.Data.DummyDataSeed
                     {
                         new Appointment
                         {
-                            AppointmentType = AppointmentType.Type1,
+                            AppointmentType = AppointmentType.FirstTime,
                             Date = DateTime.UtcNow,
                             CreationDate = DateTime.UtcNow,
                             UpdateDate= DateTime.UtcNow,
                         },
                          new Appointment
                         {
-                            AppointmentType = AppointmentType.Type1,
+                            AppointmentType = AppointmentType.FirstTime,
                             Date = DateTime.UtcNow,
                             CreationDate = DateTime.UtcNow,
                             UpdateDate= DateTime.UtcNow,
                         },
                           new Appointment
                         {
-                            AppointmentType = AppointmentType.Type1,
+                            AppointmentType = AppointmentType.Recurring,
                             Date = DateTime.UtcNow,
                             CreationDate = DateTime.UtcNow,
                             UpdateDate= DateTime.UtcNow,

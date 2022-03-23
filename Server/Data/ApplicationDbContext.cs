@@ -60,6 +60,10 @@ namespace ClinicProject.Server.Data
             #region Treatments
 
             builder.Entity<Treatment>()
+                .HasOne(a => a.Patient)
+                .WithMany(p => p.Treatments);
+
+            builder.Entity<Treatment>()
                 .HasMany(t => t.Payments)
                 .WithOne()
                 .IsRequired()
