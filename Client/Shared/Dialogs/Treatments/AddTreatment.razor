@@ -1,0 +1,58 @@
+﻿@using ClinicProject.Shared.Models.Payment
+
+<MudDialog>
+    <DialogContent>
+        <MudForm Model="Model" @ref="Form" Validation="@(ValidateValue)" ValidationDelay="0">
+            <DynamicSearchBox Label="Patient Search"
+                              Variant="Variant.Outlined"
+                              Class="mb-5"
+                              @bind-SelectedPatient="Model.PatientId" />
+            <MudNumericField Class="mb-2"
+                             Label="Patient Id"
+                             Variant="Variant.Outlined"
+                             @bind-Value="Model.PatientId"
+                             Immediate="true"
+                             For="() => Model.PatientId"
+                             ReadOnly="true" />
+            <MudTextField Class="mb-2"
+                          Variant="Variant.Outlined"
+                          Label="Treatment Type"
+                          @bind-Value="Model.TreatmentType"
+                          Immediate="true"
+                          For="() => Model.TreatmentType" />
+            <MudNumericField Label="Total Cost (S.P)"
+                             Variant="Variant.Outlined"
+                             AdornmentColor="Color.Primary"
+                             AdornmentIcon="@Icons.Outlined.CurrencyLira"
+                             @bind-Value="Model.TotalCost"
+                             Immediate="true"
+                             For="() => Model.TotalCost" />
+            <MudSelect Class="mb-2"
+                       Variant="Variant.Outlined"
+                       Label="Payment Type"
+                       @bind-Value="Model.PaymentType"
+                       Immediate="true"
+                       For="() => Model.PaymentType">
+                @foreach (var item in Enum.GetValues<PaymentType>())
+                {
+                    <MudSelectItem Value="@item" />
+                }
+            </MudSelect>
+            <MudSelect Class="mb-2"
+                       Variant="Variant.Outlined"
+                       Label="Payment Status"
+                       @bind-Value="Model.PaymentStatus"
+                       Immediate="true"
+                       For="() => Model.PaymentStatus">
+                @foreach (var item in Enum.GetValues<PaymentStatus>())
+                {
+                    <MudSelectItem Value="@item" />
+                }
+            </MudSelect>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
