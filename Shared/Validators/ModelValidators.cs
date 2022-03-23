@@ -1,4 +1,5 @@
-﻿using ClinicProject.Shared.DTOs.Appointments;
+﻿using ClinicProject.Shared.DTOs;
+using ClinicProject.Shared.DTOs.Appointments;
 using ClinicProject.Shared.DTOs.Patients;
 using FluentValidation;
 
@@ -47,6 +48,33 @@ namespace ClinicProject.Shared.Validators
                 .IsInEnum();
 
             RuleFor(appointment => appointment.Date)
+                .NotEmpty();
+
+            RuleFor(appointment => appointment.PatientId)
+               .NotEmpty();
+        }
+    }
+
+    public class TreatmentValidator : AbstractValidator<TreatmentDTO>
+    {
+        public TreatmentValidator()
+        {
+            RuleFor(treatment => treatment.TreatmentType)
+                .NotEmpty()
+                .Length(2, 40);
+
+            RuleFor(treatment => treatment.TotalCost)
+                .NotEmpty();
+
+            RuleFor(treatment => treatment.PaymentType)
+                .NotEmpty()
+                .IsInEnum();
+
+            RuleFor(treatment => treatment.PaymentStatus)
+                .NotEmpty()
+                .IsInEnum();
+
+            RuleFor(treatment => treatment.PatientId)
                 .NotEmpty();
         }
     }
