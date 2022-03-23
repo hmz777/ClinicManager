@@ -5,13 +5,23 @@
 
 <MudPaper Class="@("d-flex flex-column border-solid border-2 mud-border-default pa-4 " + Class)" Elevation="0">
     <div class="d-flex align-center">
-        <MudTextField @ref="SearchField" Class="mb-2" DebounceInterval="1000" Clearable="true" Label="Patient Search" T="string" ValueChanged="@(s => DoSearch(s))" Variant="Variant.Outlined" Adornment="Adornment.End"
+        <MudTextField @ref="SearchField"
+                      Immediate="true"
+                      For="@(() => SearchTerm)"
+                      Class="mb-2"
+                      DebounceInterval="1000"
+                      Clearable="true"
+                      Label="@Label"
+                      T="string"
+                      ValueChanged="@(s => DoSearch(s))"
+                      Variant="@Variant"
+                      Adornment="Adornment.End"
                       AdornmentIcon="@Icons.Material.Outlined.Search" AdornmentColor="Color.Primary" IconSize="Size.Medium"></MudTextField>
         <MudProgressCircular Class="@($"ms-2 {(isLoading ? "" : "d-none")}")" Color="Color.Primary" Indeterminate="true" />
     </div>
     @if (isVisible)
     {
-        <MudSelect Label="Select a patient" Variant="Variant.Outlined" T="PatientSelectModel" ValueChanged="(p) => OnItemSelected(p)">
+        <MudSelect Label="Select an item" Variant="Variant.Outlined" T="PatientSelectModel" ValueChanged="(p) => OnItemSelected(p)">
             @foreach (var patient in Patients)
             {
                 <MudSelectItem @key="patient" Value="@patient">
@@ -24,10 +34,13 @@
 
 @code {
     [Inject] ODataCRUDHandler<PatientDTO> ODataCRUDHandler { get; set; }
-
+    [Parameter] public string Label { get; set; }
+    [Parameter] public Variant Variant { get; set; }
     [Parameter] public int SelectedPatient { get; set; }
     [Parameter] public EventCallback<int> SelectedPatientChanged { get; set; }
     [Parameter] public string Class { get; set; }
+
+    string SearchTerm { get; set; }
 
     MudTextField<string> SearchField;
 
