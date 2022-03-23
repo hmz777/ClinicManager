@@ -31,6 +31,10 @@
                         <MudNumericField Class="my-2" T="int?" Clearable="true" Label="@(item.Value.DisplayName)" ValueChanged="@(s => OnSearch(s, item.Key.Name))" Variant="Variant.Outlined" Adornment="Adornment.End"
                              AdornmentIcon="@Icons.Material.Outlined.Edit" AdornmentColor="Color.Primary" IconSize="Size.Medium"></MudNumericField>
                         break;
+                    case DataField.Currency:
+                        <MudNumericField Class="my-2" T="decimal?" Clearable="true" Label="@(item.Value.DisplayName)" ValueChanged="@(s => OnSearch(s, item.Key.Name))" Variant="Variant.Outlined" Adornment="Adornment.End"
+                             AdornmentIcon="@Icons.Material.Outlined.Edit" AdornmentColor="Color.Primary" IconSize="Size.Medium"></MudNumericField>
+                        break;
                     case DataField.DateTime:
                         <CustomDateRange DateFormat="dd/MM/yyyy" Class="my-2" Label="@(item.Value.DisplayName)" DateRangeChanged="@(s => OnSearch(s, item.Key.Name))" />
                         break;
@@ -105,7 +109,7 @@
         {
             if (property.Value != null)
             {
-                if (property.Value.DataField != DataField.Navigation)
+                if (property.Value.DataField != DataField.Navigation && property.Value.DataField != DataField.None)
                 {
                     if (!string.IsNullOrEmpty(property.Value.ExpandedFrom))
                     {
@@ -124,7 +128,7 @@
         {
             if (property.Value != null)
             {
-                if (property.Value.DataField != DataField.Navigation)
+                if (property.Value.DataField != DataField.Navigation && property.Value.DataField != DataField.None)
                 {
                     if (property.Key.PropertyType == typeof(DateTime) || property.Key.PropertyType == typeof(DateTime?))
                     {
@@ -165,6 +169,12 @@
                             </MudTd>
                             break;
                         case DataField.Currency:
+                            <MudTd>
+                                <MudNumericField Label="@(property.Value.DisplayName)"
+                             @bind-Value="@(context.DecimalValues[property.Key.Name])"
+                             Variant="Variant.Outlined" Required />
+                            </MudTd>
+                            break;
                         case DataField.Number:
                             <MudTd>
                                 <MudNumericField Label="@(property.Value.DisplayName)"
