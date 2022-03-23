@@ -2,18 +2,17 @@
 using AutoMapper;
 using AutoMapper.AspNet.OData;
 using ClinicProject.Server.Data;
+using ClinicProject.Server.Data.DBModels.PatientTypes;
 using ClinicProject.Server.Data.DBModels.TreatmentTypes;
 using ClinicProject.Shared.DTOs;
+using ClinicProject.Shared.Models.Error;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.EntityFrameworkCore;
 
 namespace ClinicProject.Server.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
     public class TreatmentsController : ODataController
     {
         private readonly ApplicationDbContext _context;
@@ -25,31 +24,37 @@ namespace ClinicProject.Server.Controllers
             this.mapper = mapper;
         }
 
-        // GET: api/Treatments
         [HttpGet]
-        public async Task<IActionResult> GetTreatments(ODataQueryOptions<TreatmentDTO> options)
+        public async Task<IActionResult> Get(ODataQueryOptions<TreatmentDTO> options)
         {
             var query = await _context.Treatments.GetQueryAsync<TreatmentDTO, Treatment>(mapper, options);
             return Ok(await query.ToListAsync());
         }
 
-        // GET: api/Treatments/5
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetTreatment([FromODataUri] int id, ODataQueryOptions<TreatmentDTO> options)
+        [HttpGet]
+        public async Task<IActionResult> Get(int key, ODataQueryOptions<TreatmentDTO> options)
         {
-            var result = await _context.Treatments.Where(p => p.Id == id).GetQueryAsync(mapper, options);
+            var result = await _context.Treatments.Where(p => p.Id == key).GetQueryAsync(mapper, options);
             return Ok(await result.FirstOrDefaultAsync());
         }
 
-        // PUT: api/Treatments/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
+        [HttpPut]
         [EnableQuery]
-        public async Task<IActionResult> PutTreatment([FromODataUri] int id, [FromODataBody] TreatmentDTO treatmentDTO)
+        public async Task<IActionResult> Put(int key, [FromBody] TreatmentDTO treatmentDTO)
         {
-            if (!ModelState.IsValid || id != treatmentDTO.Id)
-            {
+            if (key != treatmentDTO.Id)
                 return BadRequest();
+
+            if (!ModelState.IsValid)
+            {
+                var ValidationErrors = new ModelValidationResult
+                {
+                    Results = ModelState.ToDictionary(
+                        m => m.Key,
+                        m => string.Join('\n', m.Value.Errors.Select(e => e.ErrorMessage)))
+                };
+
+                return BadRequest(ValidationErrors);
             }
 
             _context.Entry(mapper.Map<Treatment>(treatmentDTO)).State = EntityState.Modified;
@@ -60,7 +65,7 @@ namespace ClinicProject.Server.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TreatmentExists(id))
+                if (!TreatmentExists(key))
                 {
                     return NotFound();
                 }
@@ -73,33 +78,54 @@ namespace ClinicProject.Server.Controllers
             return NoContent();
         }
 
-        // POST: api/Treatments
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [EnableQuery]
-        public async Task<ActionResult<TreatmentDTO>> PostTreatment([FromODataBody] TreatmentDTO treatmentDTO)
+        public async Task<ActionResult<TreatmentDTO>> Post([FromBody] TreatmentDTO treatmentDTO)
         {
             if (!ModelState.IsValid)
-                return BadRequest();
+            {
+                var ValidationErrors = new ModelValidationResult
+                {
+                    Results = ModelState.ToDictionary(
+                        m => m.Key,
+                        m => string.Join('\n', m.Value.Errors.Select(e => e.ErrorMessage)))
+                };
 
-            await _context.Treatments.AddAsync(mapper.Map<Treatment>(treatmentDTO));
+                return BadRequest(ValidationErrors);
+            }
+
+            Patient patient = await _context.Patients
+                .Include(p => p.Appointments)
+                .Where(p => p.Id == treatmentDTO.PatientId)
+                .FirstOrDefaultAsync();
+
+            if (patient == null)
+            {
+                return BadRequest(new ModelValidationResult { Results = new Dictionary<string, string>() { ["Patient.Id"] = "Patient not found." } });
+            }
+
+            var treatment = mapper.Map<Treatment>(treatmentDTO);
+
+            patient.Treatments.Add(treatment);
+
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetTreatment", new { id = treatmentDTO.Id }, treatmentDTO);
+            treatmentDTO.Id = treatment.Id;
+
+            return CreatedAtAction(nameof(Get), new { key = treatmentDTO.Id }, treatmentDTO);
         }
 
-        // DELETE: api/Treatments/5
-        [HttpDelete("{id}")]
+        [HttpDelete]
         [EnableQuery]
-        public async Task<IActionResult> DeleteTreatment([FromODataUri] int id)
+        public async Task<IActionResult> Delete(int key)
         {
-            var treatment = await _context.Treatments.FindAsync(id);
-            if (treatment == null)
+            var treatments = await _context.Treatments.FindAsync(key);
+            if (treatments == null)
             {
                 return NotFound();
             }
 
-            _context.Treatments.Remove(treatment);
+            _context.Treatments.Remove(treatments);
             await _context.SaveChangesAsync();
 
             return NoContent();
