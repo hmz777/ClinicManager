@@ -57,7 +57,9 @@ namespace ClinicProject.Server.Helpers
             {
                 CreateMap<Treatment, TreatmentDTO>()
                     .IncludeBase<DBEntityBase, DTOBase>()
-                    .ForMember(s => s.Payments, opt => opt.ExplicitExpansion());
+                    .ForMember(s => s.Patient, opt => opt.ExplicitExpansion())
+                    .ForMember(s => s.Payments, opt => opt.ExplicitExpansion())
+                    .ReverseMap();
             }
         }
 
