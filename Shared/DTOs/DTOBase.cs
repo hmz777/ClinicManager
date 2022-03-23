@@ -78,6 +78,25 @@ namespace ClinicProject.Shared.DTOs
         }
 
         [JsonIgnore]
+        private IndexedProperty<string, decimal>? _decimalValues;
+
+        [JsonIgnore]
+        public IndexedProperty<string, decimal>? DecimalValues
+        {
+            get
+            {
+                if (_decimalValues == null)
+                {
+                    _decimalValues = new IndexedProperty<string, decimal>(
+                        (index) => { return (decimal)this.GetType().GetProperty(index).GetValue(this); },
+                        (index, value) => { this.GetType().GetProperty(index).SetValue(this, value); });
+                }
+
+                return _decimalValues;
+            }
+        }
+
+        [JsonIgnore]
         private IndexedProperty<string, DateTime?>? _dateValues;
 
         [JsonIgnore]
