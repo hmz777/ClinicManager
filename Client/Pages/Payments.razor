@@ -1,1 +1,17 @@
 ﻿@page "/payments"
+@using ClinicProject.Client.Shared.Dialogs.Payments
+@using ClinicProject.Shared.Payments
+@inherits ODataCRUDBase<PaymentDTO>
+
+@{
+    base.BuildRenderTree(__builder);
+}
+
+@code {
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        base.DialogType = typeof(AddPayment);
+    }
+}
