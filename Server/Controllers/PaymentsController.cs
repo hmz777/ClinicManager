@@ -3,7 +3,7 @@ using AutoMapper;
 using AutoMapper.AspNet.OData;
 using ClinicProject.Server.Data;
 using ClinicProject.Server.Data.DBModels.PaymentTypes;
-using ClinicProject.Shared.DTOs;
+using ClinicProject.Shared.Payments;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;

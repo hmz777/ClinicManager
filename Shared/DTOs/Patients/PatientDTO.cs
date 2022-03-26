@@ -1,5 +1,6 @@
 ﻿using ClinicProject.Shared.Attributes;
 using ClinicProject.Shared.DTOs.Appointments;
+using ClinicProject.Shared.DTOs.Treatments;
 using ClinicProject.Shared.Models.Patient;
 
 namespace ClinicProject.Shared.DTOs.Patients

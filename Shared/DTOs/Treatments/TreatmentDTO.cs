@@ -1,9 +1,10 @@
 ﻿using ClinicProject.Shared.Attributes;
 using ClinicProject.Shared.DTOs.Patients;
 using ClinicProject.Shared.Models.Payment;
+using ClinicProject.Shared.Payments;
 using System.Text.Json.Serialization;
 
-namespace ClinicProject.Shared.DTOs
+namespace ClinicProject.Shared.DTOs.Treatments
 {
     public class TreatmentDTO : DTOBase
     {
@@ -25,7 +26,7 @@ namespace ClinicProject.Shared.DTOs
         [DataField(DisplayName = "Payment Status", DataField = DataField.Enum, Editable = true, ClientSearchable = true, ServerSearchable = true)]
         public virtual PaymentStatus PaymentStatus { get; set; }
 
-        [DataField(DisplayName = "Payments", DataField = DataField.Navigation)]
+        [DataField(DisplayName = "Payments", DataField = DataField.NavigationView)]
         public virtual ICollection<PaymentDTO>? Payments { get; set; }
 
         [JsonIgnore]

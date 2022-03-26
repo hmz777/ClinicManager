@@ -1,4 +1,6 @@
-﻿namespace ClinicProject.Shared.DTOs
+﻿using ClinicProject.Shared.DTOs;
+
+namespace ClinicProject.Shared.Payments
 {
     public class PaymentDTO : DTOBase
     {

@@ -4,7 +4,7 @@ using AutoMapper.AspNet.OData;
 using ClinicProject.Server.Data;
 using ClinicProject.Server.Data.DBModels.PatientTypes;
 using ClinicProject.Server.Data.DBModels.TreatmentTypes;
-using ClinicProject.Shared.DTOs;
+using ClinicProject.Shared.DTOs.Treatments;
 using ClinicProject.Shared.Models.Error;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
@@ -80,7 +80,7 @@ namespace ClinicProject.Server.Controllers
 
         [HttpPost]
         [EnableQuery]
-        public async Task<ActionResult<TreatmentDTO>> Post([FromBody] TreatmentDTO treatmentDTO)
+        public async Task<IActionResult> Post([FromBody] TreatmentDTO treatmentDTO)
         {
             if (!ModelState.IsValid)
             {

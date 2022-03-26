@@ -1,4 +1,4 @@
-﻿using ClinicProject.Shared.DTOs;
+﻿using ClinicProject.Shared.DTOs.Treatments;
 using FluentValidation;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
@@ -11,8 +11,6 @@ namespace ClinicProject.Client.Shared.Dialogs.Treatments
         [Inject] IValidator<TreatmentDTO> ModelValidator { get; set; }
 
         MudForm Form;
-
-        public int SelectedPatient { get; set; }
 
         public TreatmentDTO Model { get; set; } = new();
 
@@ -31,7 +29,6 @@ namespace ClinicProject.Client.Shared.Dialogs.Treatments
         {
             if (Form.IsValid)
             {
-                Model.PatientId = SelectedPatient;
                 MudDialog.Close(DialogResult.Ok(Model));
             }
         }

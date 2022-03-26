@@ -1,6 +1,8 @@
 ﻿using ClinicProject.Shared.DTOs;
 using ClinicProject.Shared.DTOs.Appointments;
 using ClinicProject.Shared.DTOs.Patients;
+using ClinicProject.Shared.DTOs.Treatments;
+using ClinicProject.Shared.Payments;
 
 namespace ClinicProject.Client.Models
 {
