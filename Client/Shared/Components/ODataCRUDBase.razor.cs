@@ -63,7 +63,7 @@ namespace ClinicProject.Client.Shared.Components
 
             PropertyAttributes = PropertyAttributes
               .OrderByDescending(p => p.Key.Name.ToLower().StartsWith('i'))
-              .ThenByDescending(p => p.Value?.DataField != DataField.Navigation)
+              .ThenByDescending(p => p.Value?.DataField != DataField.NavigationView)
               .ToDictionary(p => p.Key, p => p.Value);
         }
 
@@ -262,6 +262,16 @@ namespace ClinicProject.Client.Shared.Components
         {
             Table.NavigateTo(Page.First);
             await Table.ReloadServerData();
+        }
+
+        #endregion
+
+        #region Data View
+
+        void DataView(object entityId)
+        {
+            //Show data viewer based on type
+            //var dialog = DialogService.Show(typeof(DataViewer<T>), $"Data Viewer - {typeof(T).Name}");
         }
 
         #endregion

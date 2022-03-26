@@ -19,7 +19,7 @@
             <MudTextField Class="my-2" Clearable="true" Label="Full Search" T="string" ValueChanged="@(s=> OnSearch(s, "Search"))" Variant="Variant.Outlined" Adornment="Adornment.End"
                           AdornmentIcon="@Icons.Material.Outlined.Edit" AdornmentColor="Color.Primary" IconSize="Size.Medium"></MudTextField>
             <MudDivider Class="my-2" />
-            @foreach (var item in PropertyAttributes.Where(i => i.Value?.DataField != DataField.Navigation && i.Value?.ClientSearchable == true))
+            @foreach (var item in PropertyAttributes.Where(i => i.Value?.DataField.HasFlag(DataField.Navigation) == false && i.Value?.ClientSearchable == true))
             {
                 switch (item.Value.DataField)
                 {
@@ -109,7 +109,8 @@
         {
             if (property.Value != null)
             {
-                if (property.Value.DataField != DataField.Navigation && property.Value.DataField != DataField.None)
+                if (property.Value.DataField.HasFlag(DataField.Navigation) == false
+                && property.Value.DataField != DataField.None)
                 {
                     if (!string.IsNullOrEmpty(property.Value.ExpandedFrom))
                     {
@@ -120,6 +121,10 @@
                         <MudTh><MudTableSortLabel T="T" SortLabel="@(property.Key.Name)">@property.Value.DisplayName</MudTableSortLabel></MudTh>
                     }
                 }
+                else if (property.Value.DataField == DataField.NavigationView)
+                {
+                    <MudTh>@property.Value.DisplayName</MudTh>
+                }
             }
         }
     </HeaderContent>
@@ -128,7 +133,8 @@
         {
             if (property.Value != null)
             {
-                if (property.Value.DataField != DataField.Navigation && property.Value.DataField != DataField.None)
+                if (property.Value.DataField.HasFlag(DataField.Navigation) == false
+                && property.Value.DataField != DataField.None)
                 {
                     if (property.Key.PropertyType == typeof(DateTime) || property.Key.PropertyType == typeof(DateTime?))
                     {
@@ -138,6 +144,12 @@
                     {
                         <MudTd DataLabel="@(property.Key.Name)">@property.Key.GetValue(context)</MudTd>
                     }
+                }
+                else if (property.Value.DataField == DataField.NavigationView)
+                {
+                    <MudTd DataLabel="@(property.Key.Name)">
+                        <MudButton OnClick="() => DataView(property.Key.GetValue(context.Id))" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small">View</MudButton>
+                    </MudTd>
                 }
             }
         }

@@ -16,6 +16,7 @@
         Enum = 512,
         Navigation = 1024,
         NavigationExpanded = 2048,
+        NavigationView = Navigation | NavigationExpanded,
         TextNavigationExpanded = Text | NavigationExpanded,
         NumberNavigationExpanded = Number | NavigationExpanded,
         CurrencyNavigationExpanded = Currency | NavigationExpanded,
