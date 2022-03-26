@@ -9,15 +9,12 @@ namespace ClinicProject.Client.Shared.Dialogs.Appointments
         [CascadingParameter] MudDialogInstance MudDialog { get; set; }
         MudForm Form;
 
-        public int SelectedPatient { get; set; }
-
         public AppointmentDTO Model { get; set; } = new();
 
         void Submit()
         {
             if (Form.IsValid)
             {
-                Model.PatientId = SelectedPatient;
                 MudDialog.Close(DialogResult.Ok(Model));
             }
         }
