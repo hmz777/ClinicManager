@@ -58,5 +58,6 @@ public class PatientDTO : DTOBase
 ### Client:
 - Apply colors to modified entities to differentiate which one is edited/deleted before batching changes to server.
 - More comprehensive tracking e.g. disable editing for to be deleted entities and vice versa.
+- Make status messages associated with enitiy rows in terms of location so we know which message belongs to which entity row.
 ### Server:
 Still thinking...
