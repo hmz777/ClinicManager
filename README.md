@@ -60,7 +60,8 @@ public class PatientDTO : DTOBase
 - Apply colors to modified entities to differentiate which one is edited/deleted before batching changes to server.
 - More comprehensive tracking e.g. disable editing for to be deleted entities and vice versa.
 - Make status messages associated with entity rows in terms of location so we know which message belongs to which entity row.
+- Add some sort of reminder to save changes.
 ### Server:
 - Change the database server to PostgreSQL.
-- Dokerize the app.
+- Dockerize the app.
 - Add more to dos.
