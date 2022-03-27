@@ -53,3 +53,10 @@ public class PatientDTO : DTOBase
 ```
 ## Result:
 ![chrome_Fje6QA0ZWC](https://user-images.githubusercontent.com/38891601/160287557-cfe8c2a4-2818-492f-87f1-fe3dbbd238d4.gif)
+
+## Todo:
+### Client:
+- Apply colors to modified entities to differentiate which one is edited/deleted before batching changes to server.
+- More comprehensive tracking e.g. disable editing for to be deleted entities and vice versa.
+### Server:
+Still thinking...
