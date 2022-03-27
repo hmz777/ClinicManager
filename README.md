@@ -8,6 +8,7 @@ Backed by OData and .NET6 with MudBlazor for presentation.
 - Full text search using the OData search (`$search`) feature (custom implementation), (`int` and `string` properties by defualt, other types must implement a custom `ToString` override).
 - Searchable fields can be controlled through the custom `DataField` attribute, `ServerSearchable` for `$search` and `ClientSearchable` for regular filering through the API.
 - All the data tables share the same generic base component that does all the wiring for you.
+- Validation is performed with fluent validation and is shared between server and client.
 
 ## Example:
 `PatientDTO`:
@@ -60,4 +61,6 @@ public class PatientDTO : DTOBase
 - More comprehensive tracking e.g. disable editing for to be deleted entities and vice versa.
 - Make status messages associated with entity rows in terms of location so we know which message belongs to which entity row.
 ### Server:
-Still thinking...
+- Change the database server to PostgreSQL.
+- Dokerize the app.
+- Add more to dos.
